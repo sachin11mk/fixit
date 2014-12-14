@@ -1,27 +1,66 @@
+{%load common_tags %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap 101 Template</title>
+    <title>Fix!t</title>
 
     <!-- Bootstrap -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{STATIC_URL}}bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{STATIC_URL}}/css/support.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+      <script src="{{STATIC_URL}}js/html5shiv.min.js"></script>
+      <script src="{{STATIC_URL}}js/respond.min.js"></script>
     <![endif]-->
   </head>
   <body>
-    <h1>Hello, world!</h1>
+
+    <div class="navbar">
+        <div class="navbar-inner">
+            <div class="container">
+                <div class="col-xs-2 col-sm-2">
+                    <h1 class="pull-left">Fixit</h1>  
+                </div>
+
+                <div class="col-xs-8 col-sm-8 col-xs-offset-2 col-sm-offset-2">
+                    {%show_admin_user%}                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container main-div">
+        <div class="row">
+            <div class="col-xs-12 col-sm-12">
+                {% block content %}
+                    <h1>Hello, world!</h1>
+                {% endblock content %}
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="footer" role="contentinfo">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-4 col-sm-4 col-xs-offset-8 col-sm-offset-8">
+                    2014-2015, Cortech 
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="{{STATIC_URL}}js/jquery-1.11.1.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="js/bootstrap.min.js"></script>
+    <script src="{{STATIC_URL}}bootstrap/js/bootstrap.min.js"></script>
   </body>
 </html>
