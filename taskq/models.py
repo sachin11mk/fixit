@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 
 class TaskQ(models.Model):
-    floor = models.CharField(max_length=80)
+    floor_no = models.CharField(max_length=80)
     floor_name = models.CharField(max_length=255, null=True)
     room = models.CharField(max_length=80)
     desc = models.TextField()
@@ -18,6 +18,4 @@ class TaskQ(models.Model):
     def get_fields(self):
         return [(field.name, field.value_to_string(self)) \
                 for field in self._meta.fields]
-
-
 

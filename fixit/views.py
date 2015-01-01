@@ -11,6 +11,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import logout as auth_logout
 from django.contrib import messages
 from django.contrib.auth.signals import user_logged_in, user_logged_out
+from django.core.urlresolvers import reverse
 
 def home(request):
     template = loader.get_template("base.html")

@@ -8,10 +8,12 @@
 
     <span class="">&nbsp;&nbsp;&#134;&nbsp;&nbsp;</span>
 
-    <a href="{% url admin_logout%}" class="text-deco-none"
+    {% url "admin_logout" as admin_logout %}
+    <a href="{{admin_logout}}" class="text-deco-none"
       title="LOGOUT">&nbsp;<i class="icon-off"></i></a>
     </small>
 {% else %}
+    {{request.user}}
     {{request}}
     {% url "admin_login" as admin_login %}
     <form class="form-inline pull-right" role="form" action="{{admin_login}}">

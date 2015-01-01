@@ -27,7 +27,7 @@ def show_admin_user(context):
         print "CCC"
         request = None
         pass
-    print "DDD",request
+    print "DDD",request.user
     is_admin = False
     username = ""
     try:

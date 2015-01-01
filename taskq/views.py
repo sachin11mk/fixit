@@ -11,8 +11,13 @@ def create_task(request):
     if request.method == "POST":
         form = TaskForm(request.POST)
         if form.is_valid():
-            pass
-            task = None
+            data = {}
+            data['floor_no'] = form.cleaned_data['floor_no']
+            data['room'] = form.cleaned_data['room']
+            data['desc'] = form.cleaned_data['desc']
+            data['level'] = form.cleaned_data['level']
+            task = save_task(data=data)
+            return HttpResponseRedirect('task/list')
         else:
             task = None
     else:
@@ -29,6 +34,7 @@ def edit_task(request, task_id):
 
 def list_task(request):
     template = loader.get_template('list_task.html')
-    context = RequestContext(request, {})
+    tasks = TaskQ.objects.all()
+    context = RequestContext(request, {'tasks':tasks})
     return HttpResponse(template.render(context))
 
