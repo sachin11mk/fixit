@@ -13,7 +13,8 @@
     </small>
 {% else %}
     {{request}}
-    <form class="form-inline pull-right" role="form">
+    {% url "admin_login" as admin_login %}
+    <form class="form-inline pull-right" role="form" action="{{admin_login}}">
         <input type="username" class="form-control" 
             id="username" placeholder="Username">
 

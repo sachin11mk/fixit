@@ -19,6 +19,7 @@ def home(request):
 
 
 def admin_login(request):
+    print "WWWWWWWW"
     template = loader.get_template("base.html")
     context = RequestContext( request, {})
     if request.method == "POST":

@@ -22,7 +22,7 @@ if proj_dir not in sys.path:
 if taskq_dir not in sys.path:
     sys.path.append(taskq_dir)
 
-sys.path.append('/home/sachin/web/venv/ve-django1.7/lib/python2.7/site-packages/django')
+sys.path.append('/home/colama/web/venv/ve-fixit/lib/python2.7/site-packages/django')
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "fixit.settings")
 
 from django.core.wsgi import get_wsgi_application
