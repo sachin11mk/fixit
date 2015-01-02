@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+    Task List
+    <div class="well">
+        {%for  task in tasks%}
+            {{task}}
+        {%endfor%}
+    </div>
+{% endblock content %}
