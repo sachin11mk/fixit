@@ -5,11 +5,12 @@
     <h2> Create Task </h2>
     <hr class="dotted" />
     <br/>
+    {%url add_task as add_task%}
     <form method="POST" 
 {%comment%}
     enctype="multipart/form-data" 
 {%endcomment%}
-        class="form-horizontal" role="form" action="{%url create_task %}">
+        class="form-horizontal" role="form" action="{{add_task}}">
        
         <div class="form-group">
         <!--

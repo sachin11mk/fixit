@@ -68,4 +68,5 @@ def handle404(request):
     return render(request,'404.html')
 
 def handle500(request):
+    print "RESESESDSDSDS***********"
     return render(request,'500.html')
