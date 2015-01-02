@@ -1,2 +1,11 @@
-Internal Server Error
+{% extends "base.html" %}
 
+{% block admin_login %}
+{% endblock admin_login %}
+
+
+{% block content %}
+    <h1 style="font-size:40px;font-weight:bold;font-color:red;">500</h1>
+    <br/><br/>
+    <h4 style="font-size:20px;font-weight:bold;">Internal Server Error. Please Contact Administrator.</h4>
+{% endblock content %}

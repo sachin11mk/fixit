@@ -6,6 +6,7 @@ from forms import TaskForm
 # Create your views here.
 
 def add_task(request):
+    print "AAA"
     template = loader.get_template('add_task.html')
     form = TaskForm()
     if request.method == "POST":
@@ -40,7 +41,7 @@ def delete_task(request, task_id):
 
 
 def task_list(request):
-    template = loader.get_template('list_task.html')
+    template = loader.get_template('task_list.html')
     tasks = TaskQ.objects.all()
     context = RequestContext(request, {'tasks':tasks})
     return HttpResponse(template.render(context))

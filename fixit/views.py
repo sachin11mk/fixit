@@ -12,6 +12,7 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib import messages
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.core.urlresolvers import reverse
+from django.shortcuts import render
 
 def home(request):
     template = loader.get_template("base.html")
@@ -39,7 +40,7 @@ def admin_login(request):
             error_msg = "Invalid Registration no / Password."
             messages.add_message(request, messages.ERROR, error_msg)
             pass
-    return HttpResponseRedirect( reverse("list_task"),)
+    return HttpResponseRedirect( reverse("task_list"),)
 
 def admin_logout(request):
     template = loader.get_template("base.html")
@@ -55,5 +56,16 @@ def admin_logout(request):
     if hasattr(request, 'user'):
         from django.contrib.auth.models import AnonymousUser
         request.user = AnonymousUser()
-    return HttpResponseRedirect( reverse("list_task"),)
+    return HttpResponseRedirect( reverse("task_list"),)
 
+def handle400(request):
+    return render(request,'400.html')
+
+def handle403(request):
+    return render(request,'403.html')
+
+def handle404(request):
+    return render(request,'404.html')
+
+def handle500(request):
+    return render(request,'500.html')
