@@ -36,8 +36,8 @@
    
     <div class="container">
         <ul class="nav nav-pills">
-          <li role="presentation" class="active"><a href="#">Task List</a></li>
-          <li role="presentation"><a href="#">Add Task</a></li>
+          <li role="presentation" class="active"><a href="{%url 'task_list'%}">Task List</a></li>
+          <li role="presentation" class=""><a href="{%url 'add_task'%}">Add Task</a></li>
         </ul> 
     </div>
 
@@ -71,5 +71,24 @@
     <script src="{{STATIC_URL}}js/jquery-1.11.1.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="{{STATIC_URL}}bootstrap/js/bootstrap.min.js"></script>
+
+    {% block common_js %}
+        <script type="text/javascript">
+            $(document).ready(function(){
+
+                /*** set active menu item. ***/
+                $('ul.nav-pills li a').click(function(e){
+                    $(this).parent().parent().find('.active').removeClass('active');
+                    $(this).parent().addClass('active');
+                    e.preventDefault();
+                });
+
+            });
+        </script>
+    {% endblock common_js%}
+
+    {% block extra_js %}
+    {% endblock extra_js%}
+
   </body>
 </html>
