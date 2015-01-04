@@ -71,6 +71,26 @@ def save_task(**kwargs):
     return task
 
 
+def update_task(instance=None, **kwargs):
+    task = TaskQ.objects.get(id=int(instance.id))
+    try:
+        floor = kwargs['form_data']['floor']
+        room = kwargs['form_data']['room']
+        desc = kwargs['form_data']['desc']
+        priority = kwargs['form_data']['priority']
+        status = kwargs['form_data']['status']
+        task.floor = floor
+        task.room = room
+        task.desc = desc
+        task.priority = priority
+        task.status = status
+        task.save()
+    except Exception, msg:
+        raise
+    return task
+
+
+
 
 
 

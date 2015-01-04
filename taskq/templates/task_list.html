@@ -2,15 +2,106 @@
 
 {% block content %}
 
-    {%comment%}
-    <div class="page-header">
-        Task List
-    </div>
-    {%endcomment%}
-
     <div class="well well-lg">
-        {%for  task in tasks%}
-            {{task}}
-        {%endfor%}
+
+        <blockquote>
+            Pending Tasks
+        </blockquote>
+
+        <table class="table table-bordered">
+            <thead>
+                {%comment%}
+                <th>#</th>
+                {%endcomment%}
+                <th>Floor</th>
+                <th>Room</th>
+                <th>Details</th>
+                <th>Priority</th>
+                {%if request.user.is_superuser or request.user.is_staff%}
+                    <th></th>
+                {%endif%}
+            </thead>
+
+            <tbody>
+
+                {%for  task in task_list%}
+                    <tr>
+                {%comment%}
+                        <td>{{forloop.counter|add:task_list.next_page_number}}.</td>
+                {%endcomment%}
+                        <td>
+                            {%if task.floor == '0' %}
+                                Ground     
+                            {%elif task.floor == '1' %}
+                                First
+                            {%elif task.floor == '2' %}
+                                Second
+                            {%elif task.floor == '3' %}
+                                Third
+                            {%elif task.floor == '4' %}
+                                Pantry
+                            {%endif%}
+                        </td>
+                        <td>
+                            {%if task.floor == '0' %}
+                                Conference     
+                            {%elif task.floor == '1' %}
+                                Room 1 
+                            {%elif task.floor == '2' %}
+                                Room 2 
+                            {%elif task.floor == '3' %}
+                                Room 3 
+                            {%elif task.floor == '4' %}
+                                WC 
+                            {%elif task.floor == '5' %}
+                                Accounts 
+                            {%elif task.floor == '6' %}
+                                Server
+                            {%endif%}
+                        </td>
+                        <td>{{task.desc}}</td>
+                        <td>
+                            {%if task.priority == 'B' %}
+                                Blocker
+                            {%elif task.priority == 'H' %}
+                                High
+                            {%elif task.priority == 'M' %}
+                                Moderate
+                            {%elif task.priority == 'L' %}
+                                Low
+                            {%elif task.priority == 'T' %}
+                                Suggestion
+                            {%endif%}
+                        </td>
+                        {%if request.user.is_superuser or request.user.is_staff%}
+                            <td>
+                                <a href="{%url 'edit_task' task.id%}">Edit</a>
+                            </td>
+                        {%endif%}
+                    </tr>         
+                {%endfor%}
+
+            </tbody>
+        </table>
+
+        <div class="pagination">
+            <span class="step-links">
+                {% if task_list.has_previous %}
+                    <a href="?page={{ task_list.previous_page_number }}">previous</a>
+                {% endif %}
+
+                <span class="current">
+                    Page {{ task_list.number }} of {{ task_list.paginator.num_pages }}.
+                </span>
+
+                {% if task_list.has_next %}
+                    <a href="?page={{ task_list.next_page_number }}">next</a>
+                {% endif %}
+            </span>
+        </div>
+
+
+
     </div>
+
 {% endblock content %}
