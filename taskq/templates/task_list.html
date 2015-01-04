@@ -1,8 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-    Task List
-    <div class="well">
+
+    {%comment%}
+    <div class="page-header">
+        Task List
+    </div>
+    {%endcomment%}
+
+    <div class="well well-lg">
         {%for  task in tasks%}
             {{task}}
         {%endfor%}

@@ -24,7 +24,7 @@
         <div class="navbar-inner">
             <div class="container">
                 <div class="col-xs-2 col-sm-2">
-                    <h1 class="pull-left">Fixit</h1>  
+                    <h1 class="pull-left"><a id="brand" href="{%url 'task_list'%}">Fixit</a></h1>  
                 </div>
 
                 <div class="col-xs-8 col-sm-8 col-xs-offset-2 col-sm-offset-2">
@@ -35,15 +35,20 @@
     </div>
    
     <div class="container">
-        <ul class="nav nav-pills">
-          <li role="presentation" class="active"><a href="{%url 'task_list'%}">Task List</a></li>
-          <li role="presentation" class=""><a href="{%url 'add_task'%}">Add Task</a></li>
+        <ul class="nav nav-tabs" >
+            <li role="presentation" class="active" >
+                <a data-toggle="tab" href="{%url 'task_list'%}">Task List</a>
+            </li>
+            <li role="presentation" class="" >
+                <a data-toggle="tab" href="{%url 'add_task'%}">Add Task</a>
+            </li>
         </ul> 
     </div>
 
     <div class="container main-div">
         <div class="row">
             <div class="col-xs-12 col-sm-12">
+                <br/>
                 {% block content %}
                     <h1>Hello, world!</h1>
                 {% endblock content %}
@@ -57,7 +62,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-xs-4 col-sm-4 col-xs-offset-8 col-sm-offset-8">
-                    <p>
+                    <p style="margin-top:25px;">
                         2014-2015, ******** Technologies Pvt. Ltd.
                     </p>
                 </div>
@@ -77,10 +82,15 @@
             $(document).ready(function(){
 
                 /*** set active menu item. ***/
-                $('ul.nav-pills li a').click(function(e){
+
+                $('ul.nav-tabs li a').click(function(e){
+                    //$('ul.nav-tabs li.active').removeClass('active')
+                    //$(this).parent('li').addClass('active')
                     $(this).parent().parent().find('.active').removeClass('active');
                     $(this).parent().addClass('active');
-                    e.preventDefault();
+                    //e.preventDefault();
+                    $(this).tab('show');
+                    e.stopPropagation();
                 });
 
             });

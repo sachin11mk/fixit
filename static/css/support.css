@@ -26,3 +26,13 @@ div.footer {
 form.form-inline {
     margin-top: 10px;
 }
+
+a,
+a:hover{ 
+    text-decoration: none;
+}
+
+a#brand {
+    font-weight: bold;
+    color: #FFF;
+}
