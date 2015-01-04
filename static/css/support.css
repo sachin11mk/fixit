@@ -36,3 +36,17 @@ a#brand {
     font-weight: bold;
     color: #FFF;
 }
+
+
+/* override bootstrap css */
+.alert {
+    padding: 2px;
+    margin-bottom: 3px;
+}
+
+/* copy bootstrap danger css to error class */
+.alert-error {
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+}

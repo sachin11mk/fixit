@@ -12,70 +12,64 @@
         enctype="multipart/form-data" 
     {%endcomment%}
             class="form-horizontal" role="form" action="{{add_task}}">
-           
+
+             {% csrf_token %}
+
+{%comment%}
+            <table>
+            {{form.as_table}}
+            </table>
+{%endcomment%}
+
+
             <div class="form-group">
-            <!--
-                <label for="floor" class="col-sm-2 control-label">Floor Number</label>
-            -->
-                <div class="col-sm-12">
-                    <input type="floor" class="form-control" id="id_floor" placeholder="Enter Floor Number">
+                <label for="floor" class="col-sm-2 control-label">Floor</label>
+                <div class="col-sm-10">
+                    {{form.floor}}
                 </div>
             </div>
 
             <div class="form-group">
-            <!--
-                <label for="room" class="col-sm-2 control-label">Room Number</label>
-            -->
-                <div class="col-sm-12">
-                    <input type="room" class="form-control" id="id_room" placeholder="Enter Room Number">
+                <label for="room" class="col-sm-2 control-label">Room</label>
+                <div class="col-sm-10">
+                    {{form.room}}
                 </div>
             </div>
 
             <div class="form-group">
-            <!--
                 <label for="desc" class="col-sm-2 control-label">Description</label>
-            -->
-                <div class="col-sm-12">
+                <div class="col-sm-10">
                     <textarea id="id_desc" class="form-control" name="desc" class="mceBasic"
                         rows="16" cols="80" placeholder="Describe the Task">{{desc}}</textarea>
                 </div>
             </div>
 
             <div class="form-group">
-            <!--
-                <label for="level" class="col-sm-2 control-label">Level</label>
-            -->
-                <div class="col-sm-12">
-                    <input type="level" class="form-control" id="id_level" placeholder="Task Urgency Level">
+                <label for="priority" class="col-sm-2 control-label">Priority</label>
+                <div class="col-sm-10">
+                    {{form.priority}}
                 </div>
             </div>
 
-
-
-    {%comment%}
-            <div class="control-group">
-                <span class="control-label-left">
-                    Task Status  
-                    <span class="pull-right">:&nbsp;</span>
-                </span>
-                <div class="controls">
-                    <input type="text" 
-                        class="valignTop" name="room" id="id_room" value={{room}}>
+            {% if request.user.is_superuser %}
+                <div class="form-group">
+                    <label for="status" class="col-sm-2 control-label">Status</label>
+                    <div class="col-sm-10">
+                        {{form.status}}
+                    </div>
                 </div>
-            </div>
-            <br/>
-    {%endcomment%}
+            {% endif %}
+
 
 
             <div class="form-group">
-            <!--
                 <label for="submit" class="col-sm-2 control-label"></label>
-            -->
-                <div class="col-sm-12">
-                    <input type="submit" name="submit" value="Create Task" 
+                <div class="col-sm-10">
+                    <input type="submit" name="submit" value="Add Task" 
                         class="btn btn-primary" />
                 </div>
             </div>
+
 
             <br/><br/>
         </form>
