@@ -36,12 +36,12 @@
    
     <div class="container">
         <ul class="nav nav-tabs" >
-            <li role="presentation" class="active" >
-                <a data-toggle="tab" href="{%url 'task_list'%}">
+            <li role="presentation" id="task-list" {%if active == 'tasklist' %} class="active" {%endif%} >
+                <a  href="{%url 'task_list'%}">
                 <span class="glyphicon glyphicon-list"></span> Task List</a>
             </li>
-            <li role="presentation" class="" >
-                <a data-toggle="tab" href="{%url 'add_task'%}">
+            <li role="presentation"  {%if active == 'addtask' %} class="active" {%endif%}  >
+                <a href="{%url 'add_task'%}">
                 <span class="glyphicon glyphicon-plus"></span> Add Task</a>
             </li>
         </ul> 
@@ -72,10 +72,20 @@
                 {% endif %}
                 <br/>
 
-                {% block content %}
-                    <h1>Hello, world!</h1>
-                {% endblock content %}
-            </div>
+{%comment%}
+                <div class="tab-content">
+                    <div class="tab-pane">
+{%endcomment%}
+
+                        {% block content %}
+                            <h1>Hello, world!</h1>
+                        {% endblock content %}
+{%comment%}
+                    </div>
+                </div>
+{%endcomment%}
+
+
         </div>
     </div>
 
@@ -103,20 +113,8 @@
     {% block common_js %}
         <script type="text/javascript">
             $(document).ready(function(){
-
-                /*** set active menu item. ***/
-
-                $('ul.nav-tabs li a').click(function(e){
-                    //$('ul.nav-tabs li.active').removeClass('active')
-                    //$(this).parent('li').addClass('active')
-                    $(this).parent().parent().find('.active').removeClass('active');
-                    $(this).parent().addClass('active');
-                    //e.preventDefault();
-                    $(this).tab('show');
-                    e.stopPropagation();
-                });
-
             });
+
         </script>
     {% endblock common_js%}
 

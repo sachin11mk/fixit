@@ -50,7 +50,8 @@ def add_task(request):
                 messages.add_message(request, messages.ERROR, err[0])
     else:
         task = None
-    context = RequestContext(request, {'task': task, 'form': form})
+    context = RequestContext(request, {'task': task, 'form': form,
+            'active': 'addtask'})
     return HttpResponse(template.render(context))
 
 
@@ -180,10 +181,10 @@ def task_list(request):
         task_list = paginator.page(paginator.num_pages)
 
 
-    print "SSSSSSSSS", task_list
     context = RequestContext(request, {
                 'tasks':tasks, 'p_tasks':p_tasks,\
                 'i_tasks':i_tasks, 'n_tasks':n_tasks, \
-                'c_tasks':c_tasks, 'task_list': task_list})
+                'c_tasks':c_tasks, 'task_list': task_list, \
+                'active': 'tasklist',})
     return HttpResponse(template.render(context))
 
