@@ -8,8 +8,10 @@ urlpatterns = patterns('',
     #url(r'^$', 'fixit.views.home', name='home'),
     url(r'^$', 'taskq.views.task_list', name='task_list'),
 
-    url(r'^admin_login/$', 'fixit.views.admin_login', name='admin_login'),
-    url(r'^admin_logout/$', 'fixit.views.admin_logout', name='admin_logout'),
+    url(r'^admin_profile/', include('admin_profile.urls')),
+
+    #url(r'^admin_login/$', 'fixit.views.admin_login', name='admin_login'),
+    #url(r'^admin_logout/$', 'fixit.views.admin_logout', name='admin_logout'),
 
     url(r'^task/', include('taskq.urls')),
     url(r'^admin/', include(admin.site.urls)),

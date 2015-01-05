@@ -16,15 +16,11 @@ register = template.Library()
 
 @register.inclusion_tag("show_admin_user.html", takes_context = True)
 def show_admin_user(context):
-    print "TTTT"
 #   for k,v in context.__dict__.iteritems():
 #       print k, v
     try:
-        print "AAA"
         request = context['request']
-        print "BBB"
     except Exception, msg:
-        print "CCC"
         request = None
         pass
     print "DDD",request.user

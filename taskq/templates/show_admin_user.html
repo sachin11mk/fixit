@@ -1,28 +1,35 @@
 
 {% if is_admin %}
-    <small>
-    <a href="#" class="text-deco-none">
-        <i class="icon-user"></i>
-        {{username}}
+    
+    <div class="pull-right" style="color:#FFF;test-decoration:none;">
+        <br/><br/>
+        <a href="#" style="color:#FFF;">
+            <span class="glyphicon glyphicon-user"></span>
+            {{username|upper}}
         </a>
 
-    <span class="">&nbsp;&nbsp;&#134;&nbsp;&nbsp;</span>
+        <span>&nbsp;|&nbsp;</span>
 
-    {% url "admin_logout" as admin_logout %}
-    <a href="{{admin_logout}}" class="text-deco-none"
-      title="LOGOUT">&nbsp;<i class="icon-off"></i></a>
-    </small>
+        {% url "admin_logout" as admin_logout %}
+        <span class="glyphicon glyphicon-off"></span>
+        <a href="{{admin_logout}}" style="color:#FFF;"
+            title="LOGOUT">LOGOUT</a>
+    </div>
+
+
 {% else %}
     {{request.user}}
     {{request}}
     {% url "admin_login" as admin_login %}
-    <form class="form-inline pull-right" role="form" action="{{admin_login}}">
-        <input type="username" class="form-control" 
-            id="username" placeholder="Username">
+    <form method="POST" class="form-inline pull-right" 
+        role="form" action="{{admin_login}}">
+        {% csrf_token %}
+        <input type="text" class="form-control" name="username"
+            id="id_username" placeholder="Username">
 
-         <input type="password" class="form-control" 
-            id="password" placeholder="Password">
-       <button type="submit" class="btn btn-default">Enter</button> 
+         <input type="password" class="form-control" name="password" 
+            id="id_password" placeholder="Password">
+       <button type="submit" class="btn btn-default">Login</button> 
     </form>
 {% endif %}
 

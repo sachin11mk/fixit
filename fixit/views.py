@@ -19,7 +19,7 @@ def home(request):
     context = RequestContext( request, {})
     return HttpResponse(template.render(context))
 
-
+"""
 def admin_login(request):
     print "WWWWWWWW"
     template = loader.get_template("base.html")
@@ -57,6 +57,8 @@ def admin_logout(request):
         from django.contrib.auth.models import AnonymousUser
         request.user = AnonymousUser()
     return HttpResponseRedirect( reverse("task_list"),)
+"""
+
 
 def handle400(request):
     return render(request,'400.html')
