@@ -51,7 +51,7 @@ class TaskQ(models.Model):
     modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return "Task-%s"%str(self.id)
+        return "Task-%s__%s"%(str(self.id), self.desc[:12])
 
     def get_fields(self):
         return [(field.name, field.value_to_string(self)) \
