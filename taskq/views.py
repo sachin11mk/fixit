@@ -125,98 +125,101 @@ def delete_task(request, task_id):
 def task_list(request):
     template = loader.get_template('task_list.html')
     p_tasks =  i_tasks = n_tasks = c_tasks = []
-    tasks = TaskQ.objects.filter(status='P')
-
-    """
-    orig_p_tasks = TaskQ.objects.filter(status__exact='P')
-
-    print 'FFFFFFFF'
-    print "EEEEEEE", TaskQ.objects.filter(status__exact='P').filter(priority__exact='B')
-    print "EEEEEEE", TaskQ.objects.filter(status__exact='P').filter(priority__exact='H')
-
-    print 'KKKKKKKKKK'
-    p_tasks.append(TaskQ.objects.filter(status__exact='P'\
-                ).filter(priority__exact='B')[0])
-    p_tasks.append(TaskQ.objects.filter(status__exact='P'\
-                ).filter(priority__exact='H')[0])
-    p_tasks.append(TaskQ.objects.filter(status__exact='P'\
-                ).filter(priority__exact='M')[0])
-    p_tasks.append(TaskQ.objects.filter(status__exact='P'\
-                ).filter(priority__exact='L')[0])
-    p_tasks.append(TaskQ.objects.filter(status__exact='P'\
-                ).filter(priority__exact='T')[0])
-
-
-
-    orig_i_tasks = TaskQ.objects.filter(status__exact='I')
-
-    i_tasks.append( TaskQ.objects.filter(status__exact='I'\
-                ).filter(priority__exact='B')[0])
-    i_tasks.append( TaskQ.objects.filter(status__exact='I'\
-                ).filter(priority__exact='H')[0])
-    i_tasks.append( TaskQ.objects.filter(status__exact='I'\
-                ).filter(priority__exact='M')[0])
-    i_tasks.append( TaskQ.objects.filter(status__exact='I'\
-                ).filter(priority__exact='L')[0])
-    i_tasks.append( TaskQ.objects.filter(status__exact='I'\
-                ).filter(priority__exact='T')[0])
-
-
-    orig_n_tasks = TaskQ.objects.filter(status__exact='N')
-
-    n_tasks.append( TaskQ.objects.filter(status__exact='N'\
-                ).filter(priority__exact='B')[0])
-    n_tasks.append( TaskQ.objects.filter(status__exact='N'\
-                ).filter(priority__exact='H')[0])
-    n_tasks.append( TaskQ.objects.filter(status__exact='N'\
-                ).filter(priority__exact='M')[0])
-    n_tasks.append( TaskQ.objects.filter(status__exact='N'\
-                ).filter(priority__exact='L')[0])
-    n_tasks.append( TaskQ.objects.filter(status__exact='N'\
-                ).filter(priority__exact='T')[0])
-
-    orig_c_tasks = TaskQ.objects.filter(status__exact='C')
-
-    c_tasks.append( TaskQ.objects.filter(status__exact='C'\
-                ).filter(priority__exact='B')[0])
-    c_tasks.append( TaskQ.objects.filter(status__exact='C'\
-                ).filter(priority__exact='H')[0])
-    c_tasks.append( TaskQ.objects.filter(status__exact='C'\
-                ).filter(priority__exact='M')[0])
-    c_tasks.append( TaskQ.objects.filter(status__exact='C'\
-                ).filter(priority__exact='L')[0])
-    c_tasks.append( TaskQ.objects.filter(status__exact='C'\
-                ).filter(priority__exact='T')[0])
-
-    """
+    tasks = TaskQ.objects.all()
 
     tasks = tasks.order_by('priority')
 
-    t1 = tasks.filter(priority='B')
-    t2 = tasks.filter(priority='H')
-    t3 = tasks.filter(priority='M')
-    t4 = tasks.filter(priority='L')
-    t5 = tasks.filter(priority='T')
-    tasks = list(chain(t1, t2, t3, t4, t5))
+    p_tasks = tasks.filter(status='P')
 
-    # Paginate pages with 200 records / page.
-    paginator = Paginator(tasks, 10)
+    #
+    # Pending tasks
+    #
+    t1 = p_tasks.filter(priority='B')
+    t2 = p_tasks.filter(priority='H')
+    t3 = p_tasks.filter(priority='M')
+    t4 = p_tasks.filter(priority='L')
+    t5 = p_tasks.filter(priority='T')
+    p_tasks = list(chain(t1, t2, t3, t4, t5))
+    # Paginate pages with 10 records / page.
+    paginator = Paginator(p_tasks, 10)
     page = request.GET.get('page', '1')
     try:
-        task_list = paginator.page(page)
+        ptask_list = paginator.page(page)
     except PageNotAnInteger:
         # If page is not an integer, deliver first page.
-        task_list = paginator.page(1)
+        ptask_list = paginator.page(1)
     except EmptyPage:
         # If page is out of range (e.g. 9999),
         # deliver last page of results.
-        task_list = paginator.page(paginator.num_pages)
+        ptask_list = paginator.page(paginator.num_pages)
 
+    #
+    # Complete tasks
+    #
+    c_tasks = tasks.filter(status='C')
+    # Paginate pages with 10 records / page.
+    paginator = Paginator(c_tasks, 5)
+    page = request.GET.get('page', '1')
+    try:
+        ctask_list = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        ctask_list = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999),
+        # deliver last page of results.
+        ctask_list = paginator.page(paginator.num_pages)
+
+
+    #
+    # In-progress tasks
+    #
+    i_tasks = tasks.filter(status='I')
+    # Paginate pages with 10 records / page.
+    paginator = Paginator(i_tasks, 5)
+    page = request.GET.get('page', '1')
+    try:
+        itask_list = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        itask_list = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999),
+        # deliver last page of results.
+        itask_list = paginator.page(paginator.num_pages)
+
+
+    #
+    # Not possible tasks
+    #
+    n_tasks = tasks.filter(status='N')
+    # Paginate pages with 10 records / page.
+    paginator = Paginator(n_tasks, 5)
+    page = request.GET.get('page', '1')
+    try:
+        ntask_list = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        ntask_list = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999),
+        # deliver last page of results.
+        ntask_list = paginator.page(paginator.num_pages)
+
+    task_cnt = len(tasks)
+    pending_cnt = len(p_tasks)
+    complete_cnt = len(c_tasks)
+    progress_cnt = len(i_tasks)
+    impossible_cnt = len(n_tasks)
+    other_cnt = progress_cnt + impossible_cnt
 
     context = RequestContext(request, {
-                'tasks':tasks, 'p_tasks':p_tasks,\
-                'i_tasks':i_tasks, 'n_tasks':n_tasks, \
-                'c_tasks':c_tasks, 'task_list': task_list, \
+                'tasks':tasks,\
+                'itask_list':itask_list, 'ntask_list':ntask_list, \
+                'ctask_list':ctask_list, 'ptask_list': ptask_list, \
+                'task_cnt': task_cnt, 'pending_cnt': pending_cnt,\
+                'complete_cnt': complete_cnt, 'progress_cnt':progress_cnt,\
+                'impossible_cnt':impossible_cnt, 'other_cnt': other_cnt,\
                 'active': 'tasklist',})
     return HttpResponse(template.render(context))
 
