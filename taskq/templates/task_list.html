@@ -77,7 +77,7 @@
                             {%endif%}
                         </td>
                         <td title="{{task.desc}}">
-                            {{task.desc|truncatechars:15}}
+                            {{task.desc|truncatechars:60}}
                         </td>
                         <td>
                             {%if task.priority == 'B' %}
@@ -196,7 +196,7 @@
                             {%endif%}
                         </td>
                         <td title="{{task.desc}}">
-                            {{task.desc|truncatechars:15}}
+                            {{task.desc|truncatechars:60}}
                         </td>
                         <td style='color:green;'>
                             {%if task.priority == 'B' %}
