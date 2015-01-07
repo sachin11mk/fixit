@@ -11,6 +11,24 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 # custom
 from models import TaskQ, save_task, update_task
 from forms import TaskForm, TaskAdminForm
+from django.contrib.auth.models import User
+from subprocess import Popen, PIPE
+from django.db.models import Q
+
+def send_postfix_mail(body, sub, to):
+    try:
+        cmd = "echo '%s' | mail -s '%s' '%s'"%(body, sub, to)
+        sp = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
+        sp.wait()
+        if sp.returncode == 0:
+            print "New task mail sent to admin user."
+        else:
+            print sp.stderr.readlines()
+            print "Error : Failed to send postfix mail"
+    except Exception, msg:
+        print msg
+        pass
+
 
 # Create your views here.
 
@@ -42,6 +60,13 @@ def add_task(request):
                 error_msg = "Failed to save task to database."
                 messages.add_message(request, messages.ERROR, error_msg)
 
+            superusers = User.objects.filter(Q(is_superuser=1) \
+                    | Q(is_staff=1))
+
+            email_list = superusers.values_list('email')
+            for to in email_list:
+                sub = "Fixit: New Task @ Floor-%s"%task.floor
+                send_postfix_mail(task.desc, sub, to[0])
             return HttpResponseRedirect(reverse('task_list'))
         else:
             task = None
@@ -99,7 +124,7 @@ def delete_task(request, task_id):
 def task_list(request):
     template = loader.get_template('task_list.html')
     p_tasks =  i_tasks = n_tasks = c_tasks = []
-    tasks = TaskQ.objects.all()
+    tasks = TaskQ.objects.filter(status='P')
 
     """
     orig_p_tasks = TaskQ.objects.filter(status__exact='P')
@@ -170,8 +195,6 @@ def task_list(request):
     page = request.GET.get('page', '1')
     try:
         task_list = paginator.page(page)
-        for pp in task_list:
-            print dir(pp), repr(pp), type(pp), pp.id
     except PageNotAnInteger:
         # If page is not an integer, deliver first page.
         task_list = paginator.page(1)
