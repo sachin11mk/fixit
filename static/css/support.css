@@ -50,3 +50,21 @@ a#brand {
     background-color: #f2dede;
     border-color: #ebccd1;
 }
+
+
+
+.bg-blocker {
+    color:   #B40404;
+}
+
+.bg-high {
+    color: #DF0101;
+}
+
+.bg-moderate {
+    color: #FE2E2E;
+}
+
+.bg-low {
+    color: #0080FF;
+}

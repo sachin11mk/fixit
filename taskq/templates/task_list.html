@@ -5,7 +5,7 @@
     <div class="well well-lg">
 
         <blockquote>
-            Pending Tasks
+            <h2>Pending Tasks</h2>
         </blockquote>
 
         <table class="table table-bordered">
@@ -13,10 +13,10 @@
                 {%comment%}
                 <th>#</th>
                 {%endcomment%}
-                <th>Floor</th>
-                <th>Room</th>
-                <th>Details</th>
-                <th>Priority</th>
+                <th><h4><b>Floor</b></h4></th>
+                <th><h4><b>Room</b></h4></th>
+                <th><h4><b>Details</b></h4></th>
+                <th><h4><b>Priority</b></h4></th>
                 {%if request.user.is_superuser or request.user.is_staff%}
                     <th></th>
                 {%endif%}
@@ -62,15 +62,25 @@
                         <td>{{task.desc}}</td>
                         <td>
                             {%if task.priority == 'B' %}
-                                Blocker
+                                <span class="bg-blocker">
+                                    Blocker
+                                </span>
                             {%elif task.priority == 'H' %}
-                                High
+                                <span class="bg-high">
+                                    High
+                                </span>
                             {%elif task.priority == 'M' %}
-                                Moderate
+                                <span class="bg-moderate">
+                                    Moderate
+                                </span>
                             {%elif task.priority == 'L' %}
-                                Low
+                                <span class="bg-low">
+                                    Low
+                                </span>
                             {%elif task.priority == 'T' %}
-                                Suggestion
+                                <span class="bg-low">
+                                    Suggestion
+                                </span>
                             {%endif%}
                         </td>
                         {%if request.user.is_superuser or request.user.is_staff%}

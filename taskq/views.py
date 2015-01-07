@@ -7,6 +7,7 @@ from django.core.urlresolvers import reverse
 from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_protect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from itertools import chain
 
 # custom
 from models import TaskQ, save_task, update_task
@@ -190,6 +191,14 @@ def task_list(request):
     """
 
     tasks = tasks.order_by('priority')
+
+    t1 = tasks.filter(priority='B')
+    t2 = tasks.filter(priority='H')
+    t3 = tasks.filter(priority='M')
+    t4 = tasks.filter(priority='L')
+    t5 = tasks.filter(priority='T')
+    tasks = list(chain(t1, t2, t3, t4, t5))
+
     # Paginate pages with 200 records / page.
     paginator = Paginator(tasks, 10)
     page = request.GET.get('page', '1')
