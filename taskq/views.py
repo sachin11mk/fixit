@@ -116,6 +116,26 @@ def edit_task(request, task_id):
     return HttpResponse(template.render(context))
 
 
+
+def mark_task_complete(request, task_id):
+    task = TaskQ.objects.get(id=task_id)
+    task.status = 'C'
+    task.save()
+    success_msg = "Task marked as complete."
+    messages.add_message(request, messages.SUCCESS, success_msg)
+    return HttpResponseRedirect(reverse('task_list'))
+
+
+def mark_task_pending(request, task_id):
+    task = TaskQ.objects.get(id=task_id)
+    task.status = 'P'
+    task.save()
+    success_msg = "Task marked as pending."
+    messages.add_message(request, messages.SUCCESS, success_msg)
+    return HttpResponseRedirect(reverse('task_list'))
+
+
+
 def delete_task(request, task_id):
     template = loader.get_template('task_list.html')
     context = RequestContext(request, {})

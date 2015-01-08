@@ -29,8 +29,8 @@
         </blockquote>
         <table class="table table-bordered">
             <thead>
+                <th><h4><b>Time</b></h4></th>
                 {%comment%}
-                <th>#</th>
                 {%endcomment%}
                 <th><h4><b>Floor</b></h4></th>
                 <th><h4><b>Room</b></h4></th>
@@ -43,6 +43,11 @@
             <tbody>
                 {%for  task in ptask_list%}
                     <tr>
+                        <td>
+                            <small>
+                                {{task.created|timesince}} ago 
+                            </small>
+                        </td>
                 {%comment%}
                         <td>{{forloop.counter|add:ptask_list.next_page_number}}.</td>
                 {%endcomment%}
@@ -104,7 +109,9 @@
                         </td>
                         {%if request.user.is_superuser or request.user.is_staff%}
                             <td>
-                                <a href="{%url 'edit_task' task.id%}">Edit</a>
+                                <a href="{%url 'edit_task' task.id%}">Edit Task</a>
+                                &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
+                                <a href="{%url 'mark_task_complete' task.id%}">Mark Done</a>
                             </td>
                         {%endif%}
                     </tr>         
@@ -213,7 +220,9 @@
                         </td>
                         {%if request.user.is_superuser or request.user.is_staff%}
                             <td>
-                                <a href="{%url 'edit_task' task.id%}">Edit</a>
+                                <a href="{%url 'edit_task' task.id%}">Edit Task</a>
+                                &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
+                                <a href="{%url 'mark_task_pending' task.id%}">Mark Pending</a>
                             </td>
                         {%endif%}
                     </tr>         
