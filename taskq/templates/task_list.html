@@ -3,22 +3,22 @@
 {% block content %}
 
     <button id="top-btn" class="btn btn-primary" type="button">
-        Total <span class="badge">{{task_cnt}}</span>
+        <small>Total</small> <span class="badge">{{task_cnt}}</span>
     </button>
     <span>&nbsp; = </span>
         
     <a href="#ptask-div" class="btn btn-danger" type="button">
-        Pending <span class="badge">{{pending_cnt}}</span>
+        <small>Pending</small> <span class="badge">{{pending_cnt}}</span>
     </a>
     
     <span>&nbsp; + </span>
     <a href="#ctask-div" class="btn btn-success" type="button">
-        Complete <span class="badge">{{complete_cnt}}</span>
+        <small>Complete</small> <span class="badge">{{complete_cnt}}</span>
     </a>
     
     <span>&nbsp; + </span>
     <a class="btn btn-info" type="button" title="In-Progress/Not possible">
-        Other <span class="badge">{{other_cnt}}</span>
+        <small>Other</small> <span class="badge">{{other_cnt}}</span>
     </a>
     
     <br/><br/>
@@ -111,7 +111,7 @@
                             <td>
                                 <a href="{%url 'edit_task' task.id%}">Edit Task</a>
                                 &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
-                                <a href="{%url 'mark_task_complete' task.id%}">Mark Done</a>
+                                <a title="Mark as done." href="{%url 'mark_task_complete' task.id%}">Done</a>
                             </td>
                         {%endif%}
                     </tr>         
@@ -222,7 +222,7 @@
                             <td>
                                 <a href="{%url 'edit_task' task.id%}">Edit Task</a>
                                 &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
-                                <a href="{%url 'mark_task_pending' task.id%}">Mark Pending</a>
+                                <a title="Mark as pending." href="{%url 'mark_task_pending' task.id%}">Pending</a>
                             </td>
                         {%endif%}
                     </tr>         
