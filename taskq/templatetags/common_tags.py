@@ -23,7 +23,6 @@ def show_admin_user(context):
     except Exception, msg:
         request = None
         pass
-    print "DDD",request.user
     is_admin = False
     username = ""
     try:
