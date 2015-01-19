@@ -67,7 +67,8 @@ def add_task(request):
             email_list = superusers.values_list('email')
             for to in email_list:
                 sub = "Fixit: New Task @ Floor-%s"%task.floor
-                send_postfix_mail(task.desc, sub, to[0])
+                #commented out automated mails.
+                ### send_postfix_mail(task.desc, sub, to[0])
             return HttpResponseRedirect(reverse('task_list'))
         else:
             task = None
