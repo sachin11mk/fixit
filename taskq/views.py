@@ -243,3 +243,44 @@ def task_list(request):
                 'active': 'tasklist',})
     return HttpResponse(template.render(context))
 
+
+
+
+def completed_list(request):
+    template = loader.get_template('completed_list.html')
+    p_tasks =  i_tasks = n_tasks = c_tasks = []
+    tasks = TaskQ.objects.all()
+
+    tasks = tasks.order_by('priority')
+
+    #
+    # Complete tasks
+    #
+    c_tasks = tasks.filter(status='C')
+    # Paginate pages with 10 records / page.
+    paginator = Paginator(c_tasks, 5)
+    page = request.GET.get('page', '1')
+    try:
+        ctask_list = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        ctask_list = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999),
+        # deliver last page of results.
+        ctask_list = paginator.page(paginator.num_pages)
+
+    task_cnt = len(tasks)
+    complete_cnt = len(c_tasks)
+
+    context = RequestContext(request, {
+                'tasks':tasks,\
+                'ctask_list':ctask_list, \
+                'task_cnt': task_cnt, \
+                'complete_cnt': complete_cnt, \
+                'active': 'ctasklist',})
+    return HttpResponse(template.render(context))
+
+
+
+
