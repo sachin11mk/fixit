@@ -212,7 +212,7 @@ def task_list(request):
     #
     # Not possible tasks
     #
-    n_tasks = tasks.filter(status='N')
+    n_tasks = tasks.filter(status='X')
     # Paginate pages with 10 records / page.
     paginator = Paginator(n_tasks, 5)
     page = request.GET.get('page', '1')
