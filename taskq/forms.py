@@ -164,6 +164,21 @@ class TaskAdminForm(TaskForm):
                 raise forms.ValidationError('Description field is required.')
         return self.cleaned_data['desc']
 
+    def clean_repeat_time(self):
+        if not self.cleaned_data.has_key('repeatable'):
+            return self.cleaned_data['repeat_time']
+        else:
+            temp_time = self.cleaned_data['repeat_time']
+            if not temp_time:
+                raise forms.ValidationError('Repeat time field is required.')
+            else:
+                time_str = "%s:00"%temp_time
+                date_str = datetime.now().strftime("%Y-%m-%d ")
+                datetime_str = "%s %s"%(date_str, time_str)
+                date_obj = datetime.strptime(datetime_str, "%Y-%m-%d %H:%M:%S")
+                return date_obj
+        #self.cleaned_data['repeat_time']
+
 
     def clean(self):
         return self.cleaned_data

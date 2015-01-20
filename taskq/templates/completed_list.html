@@ -55,12 +55,21 @@
                 </thead>
                 <tbody>
                     {%for  task in ctask_list%}
-                        <tr>
+                        <!-- <tr>  -->
+                        <tr {%if task.repeatable %} style="border-left: solid blue 2px;"{%endif%}>
                     {%comment%}
                             <td>{{forloop.counter|add:ctask_list.next_page_number}}.</td>
                     {%endcomment%}
                             <td>
                                 {%time_required task.id %}
+
+                                {% if task.repeatable %}
+                                    &nbsp;
+                                    <span class="glyphicon glyphicon-repeat"
+                                        title="">
+                                    </span>
+                                {%endif%}
+
                             </td>
                             <td>
                                 {%if task.floor == '0' %}

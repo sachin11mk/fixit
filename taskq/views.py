@@ -112,6 +112,8 @@ def edit_task(request, task_id):
         'desc': task.desc,
         'priority': task.priority,
         'status': task.status,
+        'repeatable': task.repeatable,
+        'repeat_time': task.repeat_time,
     }
     form = TaskAdminForm(initial=task_dict)
     if request.method == "POST":
@@ -123,6 +125,16 @@ def edit_task(request, task_id):
             data['desc'] = form.cleaned_data['desc']
             data['priority'] = form.cleaned_data['priority']
             data['status'] = form.cleaned_data['status']
+
+            if request.POST.has_key('repeatable'):
+                repeatable = True
+                data['repeat_time'] = form.cleaned_data['repeat_time']
+            else:
+                repeatable = False
+                data['repeat_time'] = None
+            data['repeatable'] = repeatable
+
+
             task = update_task(task, form_data=data)
             success_msg = "Task updated successfully."
             messages.add_message(request, messages.SUCCESS, success_msg)
@@ -292,6 +304,17 @@ def completed_list(request):
     tasks = TaskQ.objects.all()
 
     tasks = tasks.order_by('priority')
+    p_tasks = tasks.filter(status='P')
+    c_tasks = tasks.filter(status='C')
+    i_tasks = tasks.filter(status='I')
+    n_tasks = tasks.filter(status='N')
+
+    pending_cnt = len(p_tasks)
+    complete_cnt = len(c_tasks)
+    progress_cnt = len(i_tasks)
+    impossible_cnt = len(n_tasks)
+    other_cnt = progress_cnt + impossible_cnt
+
 
     #
     # Complete tasks
@@ -315,11 +338,8 @@ def completed_list(request):
 
     now = datetime.now()
     last_week = now - timedelta(days=7)
-    print "EEEE"
-    print now, last_week
     week_tasks =  tasks.filter(created__range=[last_week, now]).exclude(\
             status='I')
-    print week_tasks
     week_cnt = len(week_tasks)
     week_done_cnt = len(week_tasks.filter(status='C'))
 
@@ -343,8 +363,8 @@ def completed_list(request):
     context = RequestContext(request, {
                 'tasks':tasks,\
                 'ctask_list':ctask_list, \
-                'task_cnt': task_cnt, \
-                'complete_cnt': complete_cnt, \
+                'task_cnt': task_cnt, 'pending_cnt': pending_cnt,\
+                'complete_cnt': complete_cnt, 'progress_cnt':progress_cnt,\
                 #'avg_closure_time': avg_closure_time,
                 'week_cnt': week_cnt,
                 'week_done_cnt': week_done_cnt,
