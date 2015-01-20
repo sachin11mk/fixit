@@ -49,6 +49,8 @@ class TaskQ(models.Model):
             choices=PRIORITY_CHOICES)
     created = models.DateTimeField(auto_now_add=True, editable=False)
     modified = models.DateTimeField(auto_now=True)
+    completed = models.DateTimeField(null=True, blank=True)
+
 
     def __str__(self):
         return "Task-%s__%s"%(str(self.id), self.desc[:12])

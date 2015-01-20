@@ -8,6 +8,7 @@ from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_protect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from itertools import chain
+from datetime import datetime
 
 # custom
 from models import TaskQ, save_task, update_task
@@ -124,7 +125,10 @@ def edit_task(request, task_id):
 def mark_task_complete(request, task_id):
     task = TaskQ.objects.get(id=task_id)
     task.status = 'C'
+    ctime = datetime.now()
+    task.completed = ctime
     task.save()
+
     success_msg = "Task marked as complete."
     messages.add_message(request, messages.SUCCESS, success_msg)
     return HttpResponseRedirect(reverse('task_list'))
@@ -133,6 +137,7 @@ def mark_task_complete(request, task_id):
 def mark_task_pending(request, task_id):
     task = TaskQ.objects.get(id=task_id)
     task.status = 'P'
+    task.completed = None
     task.save()
     success_msg = "Task marked as pending."
     messages.add_message(request, messages.SUCCESS, success_msg)
