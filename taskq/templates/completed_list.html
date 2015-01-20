@@ -28,7 +28,14 @@
     <br/><br/>
     <div class="well well-lg" id="ctask-div">
         <blockquote>
-            <h2 style='color:green;'>Complete Tasks</h2>
+            <h2 style='color:green;'>
+                <span>Complete Tasks</span>
+                <span class="pull-right">
+                    <small title="{{week_done_cnt}} out of {{week_cnt}} tasks complete.">
+                        <i style="font-size:10px;">Weekly Fixit Rate: {{task_done_rate}}</i>
+                    </small>
+                </span>
+            </h2>
         </blockquote>
 
         {{ctask_list}}
@@ -38,7 +45,7 @@
                     {%comment%}
                     <th>#</th>
                     {%endcomment%}
-                    <th><h4><b>Time</b></h4></th>
+                    <th><h4><b>Time to fix</b></h4></th>
                     <th><h4><b>Location</b></h4></th>
                     <th><h4><b>Details</b></h4></th>
                     <th><h4><b>Priority</b></h4></th>

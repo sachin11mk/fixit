@@ -8,10 +8,12 @@ from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_protect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from itertools import chain
-from datetime import datetime
+from datetime import datetime, timedelta
+import math
 
 # custom
 from models import TaskQ, save_task, update_task
+#from models import RepeatTaskLog
 from forms import TaskForm, TaskAdminForm
 from django.contrib.auth.models import User
 from subprocess import Popen, PIPE
@@ -54,7 +56,21 @@ def add_task(request):
             data['room'] = form.cleaned_data['room']
             data['desc'] = form.cleaned_data['desc']
             data['priority'] = form.cleaned_data['priority']
+            if request.POST.has_key('repeatable'):
+                repeatable = True
+                data['repeat_time'] = form.cleaned_data['repeat_time']
+            else:
+                repeatable = False
+                data['repeat_time'] = None
+            data['repeatable'] = repeatable
+
             task = save_task(form_data=data)
+
+            """
+            if repeatable:
+                repeatTaskLog = RepeatTaskLog.objects.create(task_id=task.id,\
+                        total_cnt=1)
+            """
             if task:
                 success_msg = "Task added successfully."
                 messages.add_message(request, messages.SUCCESS, success_msg)
@@ -129,6 +145,13 @@ def mark_task_complete(request, task_id):
     task.completed = ctime
     task.save()
 
+    """
+    if task.repeatable :
+        RTL = RepeatTaskLog.objects.get(task_id=task.id)
+        RTL.passed_cnt += RTL.passed_cnt
+        RTL.save()
+    """
+
     success_msg = "Task marked as complete."
     messages.add_message(request, messages.SUCCESS, success_msg)
     return HttpResponseRedirect(reverse('task_list'))
@@ -139,6 +162,14 @@ def mark_task_pending(request, task_id):
     task.status = 'P'
     task.completed = None
     task.save()
+
+    """
+    if task.repeatable :
+        RTL = RepeatTaskLog.objects.get(task_id=task.id)
+        RTL.passed_cnt += RTL.passed_cnt
+        RTL.save()
+    """
+
     success_msg = "Task marked as pending."
     messages.add_message(request, messages.SUCCESS, success_msg)
     return HttpResponseRedirect(reverse('task_list'))
@@ -282,11 +313,42 @@ def completed_list(request):
     task_cnt = len(tasks)
     complete_cnt = len(c_tasks)
 
+    now = datetime.now()
+    last_week = now - timedelta(days=7)
+    print "EEEE"
+    print now, last_week
+    week_tasks =  tasks.filter(created__range=[last_week, now]).exclude(\
+            status='I')
+    print week_tasks
+    week_cnt = len(week_tasks)
+    week_done_cnt = len(week_tasks.filter(status='C'))
+
+    if len(week_tasks.filter(status='C')):
+        #avg_closure_time = float(len(week_tasks)) /\
+        #    len(week_tasks.filter(status='C'))
+        #avg_closure_time = int(math.ceil(avg_closure_time))
+        task_done_rate = round(float(len(week_tasks.filter(status='C'))) * 100 / \
+                len(week_tasks), 2)
+        task_done_rate = "%s %%"%task_done_rate
+
+    else:
+        if len(week_tasks.filter(status='P')):
+            #avg_closure_time = 0
+            task_done_rate = "0%"
+        else:
+            #avg_closure_time = "NA"
+            task_done_rate = "NA"
+
+
     context = RequestContext(request, {
                 'tasks':tasks,\
                 'ctask_list':ctask_list, \
                 'task_cnt': task_cnt, \
                 'complete_cnt': complete_cnt, \
+                #'avg_closure_time': avg_closure_time,
+                'week_cnt': week_cnt,
+                'week_done_cnt': week_done_cnt,
+                'task_done_rate': task_done_rate,
                 'active': 'ctasklist',})
     return HttpResponse(template.render(context))
 

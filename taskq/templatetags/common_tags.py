@@ -76,10 +76,30 @@ def time_required(task_id):
         time_req += "1 Minute"
     return time_req
 
-    """
-    return "%s"%difference
-    if difference >= timedelta(minutes=1):
-        return 'just now'
-    return '%(time)s ago' % {'time': timesince(difference).split(', ')[0]}
-    """
+
+
+"""
+@register.inclusion_tag("repeat_task_status.html", takes_context = True)
+def repeat_task_status(context, task):
+    try:
+        request = context['request']
+    except Exception, msg:
+        request = None
+        pass
+    is_admin = False
+    username = ""
+    try:
+        if request.user.is_superuser or request.user.is_staff:
+            is_admin = True
+            username = request.user.username
+
+    except Exception, msg:
+        pass
+
+    current_time = datetime.now()
+    task_target_time = task.repeat_time
+
+    return {'is_admin': is_admin, 'username' : username }
+"""
+
 

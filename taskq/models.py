@@ -50,7 +50,8 @@ class TaskQ(models.Model):
     created = models.DateTimeField(auto_now_add=True, editable=False)
     modified = models.DateTimeField(auto_now=True)
     completed = models.DateTimeField(null=True, blank=True)
-
+    repeatable = models.BooleanField(default=False)
+    repeat_time = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return "Task-%s__%s"%(str(self.id), self.desc[:12])
@@ -66,8 +67,11 @@ def save_task(**kwargs):
         room = kwargs['form_data']['room']
         desc = kwargs['form_data']['desc']
         priority = kwargs['form_data']['priority']
-        task = TaskQ.objects.create(floor=floor,
-                room=room, desc=desc, priority=priority)
+        repeatable = kwargs['form_data']['repeatable']
+        repeat_time = kwargs['form_data']['repeat_time']
+        task = TaskQ.objects.create(floor=floor, room=room, desc=desc, \
+                repeatable=repeatable, repeat_time=repeat_time, \
+                priority=priority)
     except Exception, msg:
         raise
     return task
@@ -81,9 +85,13 @@ def update_task(instance=None, **kwargs):
         desc = kwargs['form_data']['desc']
         priority = kwargs['form_data']['priority']
         status = kwargs['form_data']['status']
+        repeatable = kwargs['form_data']['repeatable']
+        repeat_time = kwargs['form_data']['repeat_time']
         task.floor = floor
         task.room = room
         task.desc = desc
+        task.repeatable = repeatable
+        task.repeat_time = repeat_time
         task.priority = priority
         task.status = status
         task.save()
@@ -93,6 +101,21 @@ def update_task(instance=None, **kwargs):
 
 
 
+"""
+class RepeatTaskLog(models.Model):
+    task_id = models.IntegerField()
+    failed_cnt = models.IntegerField(null=True, blank=True)
+    pass_cnt = models.IntegerField(null=True, blank=True)
+    total_cnt = models.IntegerField(null=True, blank=True)
+
+    def __str__(self):
+        return "Repeat_Task-%s"%str(self.task_id)
+
+    def get_fields(self):
+        return [(field.name, field.value_to_string(self)) \
+                for field in self._meta.fields]
+
+"""
 
 
 

@@ -9,6 +9,7 @@
 
     <!-- Bootstrap -->
     <link href="{{STATIC_URL}}bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{STATIC_URL}}/css/jquery-clockpicker.min.css" rel="stylesheet">
     <link href="{{STATIC_URL}}/css/support.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -20,7 +21,8 @@
   </head>
   <body>
 
-    <div class="navbar navbar-fixed-top">
+    <!--<div class="navbar navbar-fixed-top"> -->
+    <div class="navbar">
         <div class="navbar-inner">
             <div class="container">
                 <div class="col-xs-2 col-sm-2">
@@ -113,6 +115,7 @@
     <script src="{{STATIC_URL}}js/jquery-1.11.1.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="{{STATIC_URL}}bootstrap/js/bootstrap.min.js"></script>
+    <script src="{{STATIC_URL}}js/jquery-clockpicker.min.js"></script>
 
     {% block common_js %}
         <script type="text/javascript">

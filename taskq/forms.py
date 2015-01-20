@@ -3,6 +3,7 @@ import re
 from models import TaskQ
 from models import FLOOR_CHOICES, ROOM_CHOICES
 from models import STATUS_CHOICES, PRIORITY_CHOICES
+from datetime import datetime
 
 """  Radio Fields
 class TaskForm(forms.ModelForm):
@@ -78,6 +79,22 @@ class TaskForm(forms.ModelForm):
                 'placeholder': 'Select Task Priority'},
                 choices=PRIORITY_CHOICES ))
 
+    repeatable = forms.BooleanField(label='Repeatable Task',
+                required=False,
+                widget=forms.CheckboxInput(attrs={'class': 'checkbox',
+                'title': 'Check for repeatable tasks',
+                'placeholder': 'Is task repeatable?'},
+                ))
+
+    repeat_time = forms.CharField(label='Repeat Task at',
+                required=False, max_length=255,
+                widget=forms.TextInput(attrs={'class': 'form-control', \
+                'placeholder': 'Schedule Task @'}),
+                error_messages={})
+                    #'required': 'Repeat time field can not be empty'} )
+
+
+
     class Meta:
         model = TaskQ
         exclude = ('created', 'modified', 'status',)
@@ -96,11 +113,24 @@ class TaskForm(forms.ModelForm):
 
     def clean_desc(self):
         if self.cleaned_data['desc']:
-            print "AAA", self.cleaned_data['desc'].strip()
             if self.cleaned_data['desc'].strip() == '':
-                print "BBB"
                 raise forms.ValidationError('Description field is required.')
         return self.cleaned_data['desc']
+
+    def clean_repeat_time(self):
+        if not self.cleaned_data.has_key('repeatable'):
+            return self.cleaned_data['repeat_time']
+        else:
+            temp_time = self.cleaned_data['repeat_time']
+            if not temp_time:
+                raise forms.ValidationError('Repeat time field is required.')
+            else:
+                time_str = "%s:00"%temp_time
+                date_str = datetime.now().strftime("%Y-%m-%d ")
+                datetime_str = "%s %s"%(date_str, time_str)
+                date_obj = datetime.strptime(datetime_str, "%Y-%m-%d %H:%M:%S")
+                return date_obj
+        #self.cleaned_data['repeat_time']
 
     def clean(self):
         return self.cleaned_data

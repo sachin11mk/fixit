@@ -41,10 +41,16 @@
             </thead>
             <tbody>
                 {%for  task in ptask_list%}
-                    <tr>
+                    <tr {%if task.repeatable %} style="border-left: solid blue 2px;"{%endif%}>
                         <td>
                             <small>
                                 {{task.created|timesince}} ago 
+                                {% if task.repeatable %}
+                                    &nbsp;
+                                    <span class="glyphicon glyphicon-repeat"
+                                        title="Timeout: {{task.repeat_time}}">
+                                    </span>
+                                {%endif%}
                             </small>
                         </td>
                 {%comment%}
