@@ -375,3 +375,39 @@ def completed_list(request):
 
 
 
+def other_list(request):
+    template = loader.get_template('other_list.html')
+    p_tasks =  i_tasks = n_tasks = c_tasks = []
+    tasks = TaskQ.objects.all()
+
+    tasks = tasks.order_by('priority')
+    p_tasks = tasks.filter(status='P')
+    c_tasks = tasks.filter(status='C')
+    i_tasks = tasks.filter(status='I')
+    n_tasks = tasks.filter(status='N')
+
+    pending_cnt = len(p_tasks)
+    complete_cnt = len(c_tasks)
+    progress_cnt = len(i_tasks)
+    impossible_cnt = len(n_tasks)
+    other_cnt = progress_cnt + impossible_cnt
+
+    #
+    # Complete tasks
+    #
+    other_tasks =  tasks.filter(status__in=['I', 'N'])
+    task_cnt = len(tasks)
+    complete_cnt = len(c_tasks)
+
+    context = RequestContext(request, {
+                'tasks':tasks,\
+                'task_cnt': task_cnt, 'pending_cnt': pending_cnt,\
+                'complete_cnt': complete_cnt, 'progress_cnt':progress_cnt,\
+                'other_cnt': other_cnt,
+                'impossible_cnt': impossible_cnt,
+                'active': '',})
+    return HttpResponse(template.render(context))
+
+
+
+

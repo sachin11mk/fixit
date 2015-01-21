@@ -94,7 +94,6 @@ class TaskForm(forms.ModelForm):
                     #'required': 'Repeat time field can not be empty'} )
 
 
-
     class Meta:
         model = TaskQ
         exclude = ('created', 'modified', 'status',)
@@ -165,7 +164,10 @@ class TaskAdminForm(TaskForm):
         return self.cleaned_data['desc']
 
     def clean_repeat_time(self):
-        if not self.cleaned_data.has_key('repeatable'):
+
+        temp_time = self.cleaned_data['repeat_time']
+
+        if not self.cleaned_data['repeatable']:
             return self.cleaned_data['repeat_time']
         else:
             temp_time = self.cleaned_data['repeat_time']
@@ -177,7 +179,6 @@ class TaskAdminForm(TaskForm):
                 datetime_str = "%s %s"%(date_str, time_str)
                 date_obj = datetime.strptime(datetime_str, "%Y-%m-%d %H:%M:%S")
                 return date_obj
-        #self.cleaned_data['repeat_time']
 
 
     def clean(self):

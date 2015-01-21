@@ -11,4 +11,5 @@ urlpatterns = patterns( '',
     url(r'^delete/(?P<task_id>\w+)/$', views.delete_task, name='delete_task'),
     url(r'^list/$', views.task_list, name='task_list'),
     url(r'^clist/$', views.completed_list, name='completed_list'),
+    url(r'^other/$', views.other_list, name='other_list'),
 )

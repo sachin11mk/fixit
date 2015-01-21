@@ -13,7 +13,7 @@
     </a>
     
     <span>&nbsp; + </span>
-    <a href="{%url 'completed_list%}" class="label label-success" type="button">
+    <a href="{%url 'completed_list'%}" class="label label-success" type="button">
         Complete<span class="badge">{{complete_cnt}}</span>
     </a>
     
@@ -28,7 +28,7 @@
     <br/><br/>
     <div class="well well-lg" id="ctask-div">
         <blockquote>
-            <h3 style='color:green;'>
+            <h3 style='color:green;' title="Tasks that are marked as not possible.">
                 Other Tasks
             </h3>
         </blockquote>
@@ -47,7 +47,7 @@
                     {%endif%}
                 </thead>
                 <tbody>
-                    {%for  task in ctask_list%}
+                    {%for  task in other_tasks%}
                         <!-- <tr>  -->
                         <tr {%if task.repeatable %} style="border-left: solid blue 2px;"{%endif%}>
                     {%comment%}
@@ -121,28 +121,6 @@
 
                 </tbody>
             </table>
-            <div class="pagination">
-                <span class="step-links">
-                    {% if ctask_list.has_previous %}
-                        <a href="?page={{ ctask_list.previous_page_number }}">previous</a>
-                    {% endif %}
-
-                    <span class="current">
-                        Page {{ ctask_list.number }} of {{ ctask_list.paginator.num_pages }}.
-                    </span>
-
-                    {% if ctask_list.has_next %}
-                        <a href="?page={{ ctask_list.next_page_number }}">next</a>
-                    {% endif %}
-                </span>
-            </div>
-
-            <div class="pull-right"> 
-                <br/>
-                <a href="#top-btn">
-                    <span class="glyphicon glyphicon-arrow-up"></span>
-                </a>
-            </div>
         {%endif%}
     </div>
 
