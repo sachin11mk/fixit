@@ -13,7 +13,7 @@
     </a>
     
     <span>&nbsp; + </span>
-    <a href="#ctask-div" class="label label-success" type="button">
+    <a href="{%url 'completed_list%}" class="label label-success" type="button">
         Complete<span class="badge">{{complete_cnt}}</span>
     </a>
     
@@ -29,12 +29,7 @@
     <div class="well well-lg" id="ctask-div">
         <blockquote>
             <h3 style='color:green;'>
-                Completed Tasks
-                <span class="pull-right">
-                    <small title="{{week_done_cnt}} out of {{week_cnt}} tasks complete.">
-                        <i style="font-size:14px;">Weekly Fixit Rate: {{task_done_rate}}</i>
-                    </small>
-                </span>
+                Other Tasks
             </h3>
         </blockquote>
 
@@ -44,7 +39,6 @@
                     {%comment%}
                     <th>#</th>
                     {%endcomment%}
-                    <th><h4><b>Time to fix</b></h4></th>
                     <th><h4><b>Location</b></h4></th>
                     <th><h4><b>Details</b></h4></th>
                     <th><h4><b>Priority</b></h4></th>
@@ -60,14 +54,14 @@
                             <td>{{forloop.counter|add:ctask_list.next_page_number}}.</td>
                     {%endcomment%}
                             <td>
+                                {%time_required task.id %}
+
                                 {% if task.repeatable %}
                                     &nbsp;
                                     <span class="glyphicon glyphicon-repeat"
-                                        style="color:blue; font-weight:bold;"
                                         title="">
-                                    </span> &nbsp;
+                                    </span>
                                 {%endif%}
-                                {%time_required task.id %}
 
                             </td>
                             <td>
@@ -117,7 +111,7 @@
                             </td>
                             {%if request.user.is_superuser or request.user.is_staff%}
                                 <td>
-                                    <a href="{%url 'edit_task' task.id%}">Edit </a>
+                                    <a href="{%url 'edit_task' task.id%}">Edit Task</a>
                                     &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
                                     <a title="Mark as pending." href="{%url 'mark_task_pending' task.id%}">Pending</a>
                                 </td>
@@ -149,8 +143,6 @@
                     <span class="glyphicon glyphicon-arrow-up"></span>
                 </a>
             </div>
-        {%else%}
-            No complete tasks found.
         {%endif%}
     </div>
 

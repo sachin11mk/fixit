@@ -12,7 +12,7 @@
     </a>
     
     <span>&nbsp; + </span>
-    <a href="#ctask-div" class="label label-success" type="button">
+    <a href="{%url 'completed_list'%}" class="label label-success" type="button">
         Complete<span class="badge">{{complete_cnt}}</span>
     </a>
     
@@ -25,7 +25,7 @@
     <div class="well well-lg" id="ptask-div">
 
         <blockquote>
-            <h2 style='color:red;'>Pending Tasks</h2>
+            <h3 style='color:red;'>Pending Tasks</h3>
         </blockquote>
         <table class="table table-bordered">
             <thead>
@@ -44,13 +44,14 @@
                     <tr {%if task.repeatable %} style="border-left: solid blue 2px;"{%endif%}>
                         <td>
                             <small>
-                                {{task.created|timesince}} ago 
                                 {% if task.repeatable %}
                                     &nbsp;
                                     <span class="glyphicon glyphicon-repeat"
+                                        style="color:blue; font-weight:bold;"
                                         title="Timeout: {{task.repeat_time}}">
-                                    </span>
+                                    </span>&nbsp;
                                 {%endif%}
+                                {{task.created|timesince}} ago 
                             </small>
                         </td>
                 {%comment%}
@@ -113,7 +114,7 @@
                         </td>
                         {%if request.user.is_superuser or request.user.is_staff%}
                             <td>
-                                <a href="{%url 'edit_task' task.id%}">Edit Task</a>
+                                <a href="{%url 'edit_task' task.id%}">Edit </a>
                                 &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
                                 <a title="Mark as done." href="{%url 'mark_task_complete' task.id%}">Done</a>
                             </td>

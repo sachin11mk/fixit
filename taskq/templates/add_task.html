@@ -101,7 +101,8 @@
                 if( $(this).is(':checked')){
                     $('#repeat-time-div').css('display', 'block');
                     $('.clockpicker').clockpicker({
-                        'donetext': 'Done',
+                        //'donetext': 'Done',
+                        autoclose: true,
                     });
                 }
                 else {

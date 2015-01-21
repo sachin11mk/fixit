@@ -118,7 +118,7 @@ class TaskForm(forms.ModelForm):
         return self.cleaned_data['desc']
 
     def clean_repeat_time(self):
-        if not self.cleaned_data.has_key('repeatable'):
+        if not self.cleaned_data['repeatable']:
             return self.cleaned_data['repeat_time']
         else:
             temp_time = self.cleaned_data['repeat_time']

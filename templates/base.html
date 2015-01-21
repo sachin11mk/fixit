@@ -40,15 +40,15 @@
         <ul class="nav nav-tabs" >
             <li role="presentation" id="task-list" {%if active == 'tasklist' %} class="active" {%endif%} >
                 <a  href="{%url 'task_list'%}">
-                <span class="glyphicon glyphicon-list"></span> Home</a>
+                <span class="glyphicon glyphicon-list"></span> Pending</a>
             </li>
             <li role="presentation" id="task-list" {%if active == 'ctasklist' %} class="active" {%endif%} >
                 <a  href="{%url 'completed_list'%}">
-                <span class="glyphicon glyphicon-ok"></span> Finished Tasks</a>
+                <span class="glyphicon glyphicon-ok"></span> Completed</a>
             </li>
             <li role="presentation"  {%if active == 'addtask' %} class="active" {%endif%}  >
                 <a href="{%url 'add_task'%}">
-                <span class="glyphicon glyphicon-plus"></span> Add Task</a>
+                <span class="glyphicon glyphicon-plus"></span> Add</a>
             </li>
         </ul> 
     </div>
