@@ -13,7 +13,7 @@ import math
 
 # custom
 from models import TaskQ, save_task, update_task
-#from models import RepeatTaskLog
+from models import RepeatTaskLog
 from forms import TaskForm, TaskAdminForm
 from django.contrib.auth.models import User
 from subprocess import Popen, PIPE
@@ -66,11 +66,12 @@ def add_task(request):
 
             task = save_task(form_data=data)
 
-            """
             if repeatable:
-                repeatTaskLog = RepeatTaskLog.objects.create(task_id=task.id,\
-                        total_cnt=1)
-            """
+                RTL = RepeatTaskLog.objects.create(task_id=task.id,\
+                        task_repeat_time=task.repeat_time,
+                        status=0, comment="Not Done")
+                RTL.save()
+
             if task:
                 success_msg = "Task added successfully."
                 messages.add_message(request, messages.SUCCESS, success_msg)
@@ -152,18 +153,33 @@ def edit_task(request, task_id):
 
 def mark_task_complete(request, task_id):
     task = TaskQ.objects.get(id=task_id)
-    task.status = 'C'
     ctime = datetime.now()
     task.completed = ctime
+    task.status = 'C'
     task.save()
 
-    """
-    if task.repeatable :
-        RTL = RepeatTaskLog.objects.get(task_id=task.id)
-        RTL.passed_cnt += RTL.passed_cnt
-        RTL.save()
-    """
+    try:
+        if task.repeatable:
+            print RepeatTaskLog.objects.all()
+            try:
+                RTL = RepeatTaskLog.objects.get(task_id=task.id,\
+                    task_repeat_time=task.repeat_time)
+                if RTL:
+                    RTL.status = 1
+                    RTL.comment = "Complete"
+                    RTL.save()
 
+            #except ObjectDoesNotExist:
+            except Exception, msg:
+                RTL = RepeatTaskLog.objects.create(task_id=task.id,\
+                        task_repeat_time=task.repeat_time,
+                        status=1, comment="Complete")
+                RTL.save()
+                print msg
+
+    except Exception, msg:
+        print msg
+        raise
     success_msg = "Task marked as complete."
     messages.add_message(request, messages.SUCCESS, success_msg)
     return HttpResponseRedirect(reverse('task_list'))
@@ -174,24 +190,44 @@ def mark_task_pending(request, task_id):
     task.status = 'P'
     task.completed = None
     task.save()
+    try:
+        if task.repeatable:
+            try:
+                RTL = RepeatTaskLog.objects.get(task_id=task.id,\
+                    task_repeat_time=task.repeat_time)
+                if RTL:
+                    RTL.status = 0
+                    RTL.comment = "Not Done"
+                    RTL.save()
+            except Exception, msg:
+            #except ObjectDoesNotExist:
+                RTL = RepeatTaskLog.objects.create(task_id=task.id,\
+                        task_repeat_time=task.repeat_time,
+                        status=1, comment="Not Done")
+                RTL.save()
 
-    """
-    if task.repeatable :
-        RTL = RepeatTaskLog.objects.get(task_id=task.id)
-        RTL.passed_cnt += RTL.passed_cnt
-        RTL.save()
-    """
-
+                print msg
+    except Exception, msg:
+        print msg
     success_msg = "Task marked as pending."
     messages.add_message(request, messages.SUCCESS, success_msg)
     return HttpResponseRedirect(reverse('task_list'))
 
 
-
 def delete_task(request, task_id):
-    template = loader.get_template('task_list.html')
-    context = RequestContext(request, {})
-    return HttpResponse(template.render(context))
+    if request.user.is_superuser:
+        template = loader.get_template('task_list.html')
+        context = RequestContext(request, {})
+        task = TaskQ.objects.get(id=task_id)
+        task.delete()
+        success_msg = "Task deleted successfully."
+        messages.add_message(request, messages.SUCCESS, success_msg)
+        return HttpResponseRedirect(reverse('task_list'))
+    else:
+        error_msg = "Only superuser can delete a task."
+        messages.add_message(request, messages.error, error_msg)
+        return HttpResponseRedirect(reverse('task_list'))
+        #return HttpResponse(template.render(context))
 
 
 def task_list(request):

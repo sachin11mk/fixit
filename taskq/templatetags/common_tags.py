@@ -47,7 +47,6 @@ def time_required(task_id):
     task = TaskQ.objects.get(id=task_id)
     open_time = task.created
     close_time = task.completed
-
     try:
         delta = close_time - open_time
     except:
@@ -62,6 +61,39 @@ def time_required(task_id):
 
     print close_time , open_time
     print delta.seconds, deltaHours, deltaWeeks, deltaMinutes, deltaDays
+    time_req = ""
+    if deltaWeeks:
+        time_req += "%s Weeks "%deltaWeeks
+    if deltaDays:
+        time_req += "%s Days "%deltaDays
+    if deltaHours:
+        time_req += "%s Hours "%deltaHours
+    if deltaMinutes:
+        time_req += "%s Minutes "%deltaMinutes
+
+    if deltaSeconds and not time_req:
+        time_req += "1 Minute"
+    return time_req
+
+
+
+@register.simple_tag
+def repeat_timesince(task_id):
+    task = TaskQ.objects.get(id=task_id)
+    open_time = task.repeat_time
+    open_time = open_time.replace(hour=0, minute=0, second=0)
+    cur_time = datetime.now()
+    try:
+        delta = cur_time - open_time
+    except:
+        return "NA"
+
+    deltaMinutes      = delta.seconds // 60
+    deltaHours        = delta.seconds // 3600
+    deltaMinutes     -= deltaHours * 60
+    deltaWeeks        = delta.days    // 7
+    deltaSeconds      = delta.seconds - deltaMinutes * 60 - deltaHours * 3600
+    deltaDays         = delta.days    - deltaWeeks * 7
     time_req = ""
     if deltaWeeks:
         time_req += "%s Weeks "%deltaWeeks

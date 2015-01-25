@@ -120,6 +120,10 @@
                                     <a href="{%url 'edit_task' task.id%}">Edit </a>
                                     &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
                                     <a title="Mark as pending." href="{%url 'mark_task_pending' task.id%}">Pending</a>
+                                    {%if request.user.is_superuser%}
+                                        &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
+                                        <a href="{%url 'delete_task' task.id%}">Delete </a>
+                                    {%endif%}
                                 </td>
                             {%endif%}
                         </tr>         

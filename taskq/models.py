@@ -80,6 +80,8 @@ def save_task(**kwargs):
 def update_task(instance=None, **kwargs):
     task = TaskQ.objects.get(id=int(instance.id))
     try:
+        orig_repeat_time = task.repeat_time
+
         floor = kwargs['form_data']['floor']
         room = kwargs['form_data']['room']
         desc = kwargs['form_data']['desc']
@@ -95,18 +97,34 @@ def update_task(instance=None, **kwargs):
         task.priority = priority
         task.status = status
         task.save()
+
+        try:
+            if task.repeatable:
+                if task.repeat_time != orig_repeat_time:
+                    RTL = RepeatTaskLog.objects.create(task_id=task.id,\
+                        task_repeat_time=task.repeat_time,
+                        status=0, comment="Not Done")
+                else:
+                    if task.status == "C":
+                        RTL = RepeatTaskLog.objects.get(task_id=task.id,\
+                            task_repeat_time=task.repeat_time)
+                        RTL.status = 1
+                        RTL.comment ="Complete"
+                        RTL.save()
+        except Exception, msg:
+            print msg
+
     except Exception, msg:
         raise
     return task
 
 
 
-"""
 class RepeatTaskLog(models.Model):
     task_id = models.IntegerField()
-    failed_cnt = models.IntegerField(null=True, blank=True)
-    pass_cnt = models.IntegerField(null=True, blank=True)
-    total_cnt = models.IntegerField(null=True, blank=True)
+    task_repeat_time = models.DateTimeField()
+    status = models.BooleanField(default=False)
+    comment = models.CharField(max_length=155, null=True)
 
     def __str__(self):
         return "Repeat_Task-%s"%str(self.task_id)
@@ -115,7 +133,6 @@ class RepeatTaskLog(models.Model):
         return [(field.name, field.value_to_string(self)) \
                 for field in self._meta.fields]
 
-"""
 
 
 

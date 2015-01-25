@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{%load common_tags%}
 
 {% block content %}
 
@@ -50,8 +51,10 @@
                                         style="color:blue; font-weight:bold;"
                                         title="Timeout: {{task.repeat_time}}">
                                     </span>&nbsp;
+                                    {%repeat_timesince task.id %}
+                                {% else %}
+                                    {{task.created|timesince}} ago 
                                 {%endif%}
-                                {{task.created|timesince}} ago 
                             </small>
                         </td>
                 {%comment%}
@@ -117,6 +120,10 @@
                                 <a href="{%url 'edit_task' task.id%}">Edit </a>
                                 &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
                                 <a title="Mark as done." href="{%url 'mark_task_complete' task.id%}">Done</a>
+                                {%if request.user.is_superuser%}
+                                    &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
+                                    <a href="{%url 'delete_task' task.id%}">Delete </a>
+                                {%endif%}
                             </td>
                         {%endif%}
                     </tr>         
