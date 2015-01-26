@@ -3,36 +3,55 @@
 
 {% block content %}
 
-    <span id="top-btn" class="label label-primary" type="button">
-        Total<span class="badge">{{task_cnt}}</span>
-    </span>
-    <span>&nbsp; = </span>
-        
-    <a href="#ptask-div" class="label label-danger" type="button">
-        Pending<span class="badge">{{pending_cnt}}</span>
-    </a>
-    
-    <span>&nbsp; + </span>
-    <a href="{%url 'completed_list'%}" class="label label-success" type="button">
-        Complete<span class="badge">{{complete_cnt}}</span>
-    </a>
-    
-    <span>&nbsp; + </span>
-    <a href="{%url 'other_list' %}" class="label label-info" title="In-Progress/Not possible">
-        Other<span class="badge">{{other_cnt}}</span>
-    </a>
-    
     <br/><br/>
     <div class="well well-lg" id="ptask-div">
 
         <blockquote>
-            <h3 style='color:red;'>Pending Tasks</h3>
+            <h3 style='color:red;'>Repeatable Task Log</h3>
         </blockquote>
+
+
+        {% for key, RT in rtlog_dict.iteritems %}
+            <a href="{%url 'task_details' key %}" title="{% show_task_desc key%}"
+            >Task-{{key}}</a>
+            &nbsp;&nbsp;
+            <span class="label label-success"><span class="badge">
+                {{RT.pass_cnt}}
+            </span></span> &nbsp;out of &nbsp;
+            <span class="label label-info"><span class="badge">
+                {{RT.total_cnt}}
+            </span></span> completed.
+
+            <br/><br/>
+            <div class="panel panel-default">
+                <div class="col-xs-4" style="background:#E5E4E2;">Target Time</div>
+                <div class="col-xs-2" style="background:#E5E4E2;">Status</div>
+                <div class="col-xs-6" style="background:#E5E4E2;">Comment</div>
+                <br/>
+                {% for rtl in RT.rtl_list %}
+                    <span class="col-xs-4">
+                        {{rtl.task_repeat_time}}
+                    </span>
+                    <span class="col-xs-2">
+                        {{rtl.status}}
+                    </span>
+                    <span class="col-xs-6">
+                        {{rtl.comment}}
+                    </span>
+                    <br/>
+                {%endfor%}
+            </div>
+            <br/>
+            <hr />
+        {% endfor %}
+    </div>
+        {#% endfor %#}
+
+
+{%comment%}
         <table class="table table-bordered">
             <thead>
-                <th><h4><b>Time</b></h4></th>
-                {%comment%}
-                {%endcomment%}
+                <th><h4><b>#</b></h4></th>
                 <th><h4><b>Location</b></h4></th>
                 <th><h4><b>Details</b></h4></th>
                 <th><h4><b>Priority</b></h4></th>
@@ -57,9 +76,9 @@
                                 {%endif%}
                             </small>
                         </td>
-                {%comment%}
+                {#%comment%#}
                         <td>{{forloop.counter|add:ptask_list.next_page_number}}.</td>
-                {%endcomment%}
+                {#%endcomment%#}
                         <td>
                             {%if task.floor == '0' %}
                                 Ground Floor
@@ -154,6 +173,7 @@
         </div>
 
     </div>
+{%endcomment%}
 
 
 

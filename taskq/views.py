@@ -8,9 +8,12 @@ from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_protect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from itertools import chain
+from datetime import datetime, timedelta
+import math
 
 # custom
 from models import TaskQ, save_task, update_task
+from models import RepeatTaskLog
 from forms import TaskForm, TaskAdminForm
 from django.contrib.auth.models import User
 from subprocess import Popen, PIPE
@@ -53,7 +56,22 @@ def add_task(request):
             data['room'] = form.cleaned_data['room']
             data['desc'] = form.cleaned_data['desc']
             data['priority'] = form.cleaned_data['priority']
+            if request.POST.has_key('repeatable'):
+                repeatable = True
+                data['repeat_time'] = form.cleaned_data['repeat_time']
+            else:
+                repeatable = False
+                data['repeat_time'] = None
+            data['repeatable'] = repeatable
+
             task = save_task(form_data=data)
+
+            if repeatable:
+                RTL = RepeatTaskLog.objects.create(task_id=task.id,\
+                        task_repeat_time=task.repeat_time,
+                        status=0, comment="Not Done")
+                RTL.save()
+
             if task:
                 success_msg = "Task added successfully."
                 messages.add_message(request, messages.SUCCESS, success_msg)
@@ -67,7 +85,11 @@ def add_task(request):
             email_list = superusers.values_list('email')
             for to in email_list:
                 sub = "Fixit: New Task @ Floor-%s"%task.floor
-                send_postfix_mail(task.desc, sub, to[0])
+                #
+                # comment out test automated mails.
+                #
+                ### send_postfix_mail(task.desc, sub, to[0])
+
             return HttpResponseRedirect(reverse('task_list'))
         else:
             task = None
@@ -81,6 +103,61 @@ def add_task(request):
     return HttpResponse(template.render(context))
 
 
+def task_details(request, task_id):
+    template = loader.get_template('task.html')
+    task = TaskQ.objects.get(id=task_id)
+    heading = ""
+    # Which Floor?
+    if task.floor == "0":
+        heading += "Ground Floor ==>"
+    elif task.floor == "1":
+        heading += "First Floor ==>"
+    elif task.floor == "2":
+        heading += "Second Floor ==>"
+    elif task.floor == "3":
+        heading += "Third Floor ==>"
+    else:
+        heading += "Pantry Area ==>"
+
+    # Which Room?
+    if task.room == "0":
+        heading += "Conf. Room "
+    elif task.room == "1":
+        heading += "Room 1 "
+    elif task.room == "2":
+        heading += "Room 2 "
+    elif task.room == "3":
+        heading += "Room 3 "
+    elif task.room == "4":
+        heading += "WC "
+    elif task.room == "5":
+        heading += "Accounts "
+    elif task.room == "6":
+        heading += "Server "
+
+    if task.status == "P":
+        status = "Pending"
+    elif task.status == "I":
+        status = "In Progress"
+    elif task.status == "C":
+        status = "Complete"
+    else:
+        status = "Not Possible"
+
+    if task.priority == "B":
+        priority = "Blocker"
+    elif task.priority == "H":
+        priority = "High"
+    elif task.priority == "M":
+        priority = "Moderate"
+    else:
+        priority = "Low"
+
+    context = RequestContext(request, {'task': task, 'heading': heading,\
+            'status': status, 'priority': priority})
+    return HttpResponse(template.render(context))
+
+
 def edit_task(request, task_id):
     template = loader.get_template('edit_task.html')
     task = TaskQ.objects.get(id=task_id)
@@ -91,6 +168,8 @@ def edit_task(request, task_id):
         'desc': task.desc,
         'priority': task.priority,
         'status': task.status,
+        'repeatable': task.repeatable,
+        'repeat_time': task.repeat_time,
     }
     form = TaskAdminForm(initial=task_dict)
     if request.method == "POST":
@@ -102,6 +181,16 @@ def edit_task(request, task_id):
             data['desc'] = form.cleaned_data['desc']
             data['priority'] = form.cleaned_data['priority']
             data['status'] = form.cleaned_data['status']
+
+            if request.POST.has_key('repeatable'):
+                repeatable = True
+                data['repeat_time'] = form.cleaned_data['repeat_time']
+            else:
+                repeatable = False
+                data['repeat_time'] = None
+            data['repeatable'] = repeatable
+
+
             task = update_task(task, form_data=data)
             success_msg = "Task updated successfully."
             messages.add_message(request, messages.SUCCESS, success_msg)
@@ -119,8 +208,33 @@ def edit_task(request, task_id):
 
 def mark_task_complete(request, task_id):
     task = TaskQ.objects.get(id=task_id)
+    ctime = datetime.now()
+    task.completed = ctime
     task.status = 'C'
     task.save()
+
+    try:
+        if task.repeatable:
+            print RepeatTaskLog.objects.all()
+            try:
+                RTL = RepeatTaskLog.objects.get(task_id=task.id,\
+                    task_repeat_time=task.repeat_time)
+                if RTL:
+                    RTL.status = 1
+                    RTL.comment = "Complete"
+                    RTL.save()
+
+            #except ObjectDoesNotExist:
+            except Exception, msg:
+                RTL = RepeatTaskLog.objects.create(task_id=task.id,\
+                        task_repeat_time=task.repeat_time,
+                        status=1, comment="Complete")
+                RTL.save()
+                print msg
+
+    except Exception, msg:
+        print msg
+        raise
     success_msg = "Task marked as complete."
     messages.add_message(request, messages.SUCCESS, success_msg)
     return HttpResponseRedirect(reverse('task_list'))
@@ -129,17 +243,75 @@ def mark_task_complete(request, task_id):
 def mark_task_pending(request, task_id):
     task = TaskQ.objects.get(id=task_id)
     task.status = 'P'
+    task.completed = None
     task.save()
+    try:
+        if task.repeatable:
+            try:
+                RTL = RepeatTaskLog.objects.get(task_id=task.id,\
+                    task_repeat_time=task.repeat_time)
+                if RTL:
+                    RTL.status = 0
+                    RTL.comment = "Not Done"
+                    RTL.save()
+            except Exception, msg:
+            #except ObjectDoesNotExist:
+                RTL = RepeatTaskLog.objects.create(task_id=task.id,\
+                        task_repeat_time=task.repeat_time,
+                        status=1, comment="Not Done")
+                RTL.save()
+
+                print msg
+    except Exception, msg:
+        print msg
     success_msg = "Task marked as pending."
     messages.add_message(request, messages.SUCCESS, success_msg)
     return HttpResponseRedirect(reverse('task_list'))
 
 
-
 def delete_task(request, task_id):
-    template = loader.get_template('task_list.html')
-    context = RequestContext(request, {})
-    return HttpResponse(template.render(context))
+    if request.user.is_superuser:
+        template = loader.get_template('task_list.html')
+        context = RequestContext(request, {})
+        task = TaskQ.objects.get(id=task_id)
+        task.delete()
+        success_msg = "Task deleted successfully."
+        messages.add_message(request, messages.SUCCESS, success_msg)
+        return HttpResponseRedirect(reverse('task_list'))
+    else:
+        error_msg = "Only superuser can delete a task."
+        messages.add_message(request, messages.error, error_msg)
+        return HttpResponseRedirect(reverse('task_list'))
+        #return HttpResponse(template.render(context))
+
+
+def repeat_task_log(request):
+    if request.user.is_superuser:
+        template = loader.get_template('repeat_task_log.html')
+        context = RequestContext(request, {})
+        RTL = RepeatTaskLog.objects.all()
+        rtlog_dict = {}
+        rtasks = TaskQ.objects.filter(repeatable=1)
+        for rt in rtasks:
+            rtl_list =RepeatTaskLog.objects.filter(\
+                    task_id=rt.id).order_by('task_repeat_time')
+            if not rtl_list:
+                continue
+            pass_cnt = len(rtl_list.filter(status=1))
+            total_cnt = len(rtl_list)
+            rtlog_dict.update({'%s'%rt.id: {'rtl_list': rtl_list, \
+                    'pass_cnt': pass_cnt, 'total_cnt':total_cnt}})
+
+        context = RequestContext(request, {'RTL': RTL, 'rtasks':rtasks,\
+            'rtlog_dict': rtlog_dict,
+            'active': 'rtlog'})
+        return HttpResponse(template.render(context))
+    else:
+        error_msg = "Access denied."
+        messages.add_message(request, messages.error, error_msg)
+        return HttpResponseRedirect(reverse('task_list'))
+        #return HttpResponse(template.render(context))
+
 
 
 def task_list(request):
@@ -242,4 +414,120 @@ def task_list(request):
                 'impossible_cnt':impossible_cnt, 'other_cnt': other_cnt,\
                 'active': 'tasklist',})
     return HttpResponse(template.render(context))
+
+
+
+
+def completed_list(request):
+    template = loader.get_template('completed_list.html')
+    p_tasks =  i_tasks = n_tasks = c_tasks = []
+    tasks = TaskQ.objects.all()
+
+    tasks = tasks.order_by('priority')
+    p_tasks = tasks.filter(status='P')
+    c_tasks = tasks.filter(status='C')
+    i_tasks = tasks.filter(status='I')
+    n_tasks = tasks.filter(status='N')
+
+    pending_cnt = len(p_tasks)
+    complete_cnt = len(c_tasks)
+    progress_cnt = len(i_tasks)
+    impossible_cnt = len(n_tasks)
+    other_cnt = progress_cnt + impossible_cnt
+
+
+    #
+    # Complete tasks
+    #
+    c_tasks = tasks.filter(status='C')
+    # Paginate pages with 10 records / page.
+    paginator = Paginator(c_tasks, 5)
+    page = request.GET.get('page', '1')
+    try:
+        ctask_list = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        ctask_list = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999),
+        # deliver last page of results.
+        ctask_list = paginator.page(paginator.num_pages)
+
+    task_cnt = len(tasks)
+    complete_cnt = len(c_tasks)
+
+    now = datetime.now()
+    last_week = now - timedelta(days=7)
+    week_tasks =  tasks.filter(created__range=[last_week, now]).exclude(\
+            status='I')
+    week_cnt = len(week_tasks)
+    week_done_cnt = len(week_tasks.filter(status='C'))
+
+    if len(week_tasks.filter(status='C')):
+        #avg_closure_time = float(len(week_tasks)) /\
+        #    len(week_tasks.filter(status='C'))
+        #avg_closure_time = int(math.ceil(avg_closure_time))
+        task_done_rate = round(float(len(week_tasks.filter(status='C'))) * 100 / \
+                len(week_tasks), 2)
+        task_done_rate = "%s %%"%task_done_rate
+
+    else:
+        if len(week_tasks.filter(status='P')):
+            #avg_closure_time = 0
+            task_done_rate = "0%"
+        else:
+            #avg_closure_time = "NA"
+            task_done_rate = "NA"
+
+
+    context = RequestContext(request, {
+                'tasks':tasks,\
+                'ctask_list':ctask_list, \
+                'task_cnt': task_cnt, 'pending_cnt': pending_cnt,\
+                'complete_cnt': complete_cnt, 'progress_cnt':progress_cnt,\
+                #'avg_closure_time': avg_closure_time,
+                'week_cnt': week_cnt,
+                'week_done_cnt': week_done_cnt,
+                'task_done_rate': task_done_rate,
+                'active': 'ctasklist',})
+    return HttpResponse(template.render(context))
+
+
+
+
+def other_list(request):
+    template = loader.get_template('other_list.html')
+    p_tasks =  i_tasks = n_tasks = c_tasks = []
+    tasks = TaskQ.objects.all()
+
+    tasks = tasks.order_by('priority')
+    p_tasks = tasks.filter(status='P')
+    c_tasks = tasks.filter(status='C')
+    i_tasks = tasks.filter(status='I')
+    n_tasks = tasks.filter(status='N')
+
+    pending_cnt = len(p_tasks)
+    complete_cnt = len(c_tasks)
+    progress_cnt = len(i_tasks)
+    impossible_cnt = len(n_tasks)
+    other_cnt = progress_cnt + impossible_cnt
+
+    #
+    # Complete tasks
+    #
+    other_tasks =  tasks.filter(status__in=['I', 'N'])
+    task_cnt = len(tasks)
+    complete_cnt = len(c_tasks)
+
+    context = RequestContext(request, {
+                'tasks':tasks,\
+                'task_cnt': task_cnt, 'pending_cnt': pending_cnt,\
+                'complete_cnt': complete_cnt, 'progress_cnt':progress_cnt,\
+                'other_cnt': other_cnt,
+                'impossible_cnt': impossible_cnt,
+                'active': '',})
+    return HttpResponse(template.render(context))
+
+
+
 

@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{%load common_tags%}
+
+{% block content %}
+
+    <span id="top-btn" class="label label-primary" type="button">
+        Total<span class="badge">{{task_cnt}}</span>
+    </span>
+    <span>&nbsp; = </span>
+        
+    <a href="{%url 'task_list'%}" class="label label-danger" type="button">
+        Pending<span class="badge">{{pending_cnt}}</span>
+    </a>
+    
+    <span>&nbsp; + </span>
+    <a href="#ctask-div" class="label label-success" type="button">
+        Complete<span class="badge">{{complete_cnt}}</span>
+    </a>
+    
+    <span>&nbsp; + </span>
+    <span class="label label-info" title="In-Progress/Not possible">
+        Other<span class="badge">{{other_cnt}}</span>
+    </span>
+    
+
+<!-- ++++++++++++++++  complete task  ++++++++++++++++++  --> 
+
+    <br/><br/>
+    <div class="well well-lg" id="ctask-div">
+        <blockquote>
+            <h3 style='color:green;'>
+                Completed Tasks
+                <span class="pull-right">
+                    <small title="{{week_done_cnt}} out of {{week_cnt}} tasks complete.">
+                        <i style="font-size:14px;">Weekly Fixit Rate: {{task_done_rate}}</i>
+                    </small>
+                </span>
+            </h3>
+        </blockquote>
+
+        {%if ctask_list%}
+            <table class="table table-bordered">
+                <thead>
+                    {%comment%}
+                    <th>#</th>
+                    {%endcomment%}
+                    <th><h4><b>Time to fix</b></h4></th>
+                    <th><h4><b>Location</b></h4></th>
+                    <th><h4><b>Details</b></h4></th>
+                    <th><h4><b>Priority</b></h4></th>
+                    {%if request.user.is_superuser or request.user.is_staff%}
+                        <th></th>
+                    {%endif%}
+                </thead>
+                <tbody>
+                    {%for  task in ctask_list%}
+                        <!-- <tr>  -->
+                        <tr {%if task.repeatable %} style="border-left: solid blue 2px;"{%endif%}>
+                    {%comment%}
+                            <td>{{forloop.counter|add:ctask_list.next_page_number}}.</td>
+                    {%endcomment%}
+                            <td>
+                                {% if task.repeatable %}
+                                    &nbsp;
+                                    <span class="glyphicon glyphicon-repeat"
+                                        style="color:blue; font-weight:bold;"
+                                        title="">
+                                    </span> &nbsp;
+                                {%endif%}
+                                {%time_required task.id %}
+
+                            </td>
+                            <td>
+                                {%if task.floor == '0' %}
+                                    Ground Floor     
+                                {%elif task.floor == '1' %}
+                                    First Floor
+                                {%elif task.floor == '2' %}
+                                    Second Floor
+                                {%elif task.floor == '3' %}
+                                    Third Floor
+                                {%elif task.floor == '4' %}
+                                    Pantry
+                                {%endif%}
+                                =&gt;
+                                {%if task.room == '0' %}
+                                    Conference     
+                                {%elif task.room == '1' %}
+                                    Room 1 
+                                {%elif task.room == '2' %}
+                                    Room 2 
+                                {%elif task.room == '3' %}
+                                    Room 3 
+                                {%elif task.room == '4' %}
+                                    WC 
+                                {%elif task.room == '5' %}
+                                    Accounts 
+                                {%elif task.room == '6' %}
+                                    Server
+                                {%endif%}
+                            </td>
+                            <td title="{{task.desc}}">
+                                {{task.desc|truncatechars:60}}
+                            </td>
+                            <td style='color:green;'>
+                                {%if task.priority == 'B' %}
+                                        Blocker
+                                {%elif task.priority == 'H' %}
+                                        High
+                                {%elif task.priority == 'M' %}
+                                        Moderate
+                                {%elif task.priority == 'L' %}
+                                        Low
+                                {%elif task.priority == 'T' %}
+                                        Suggestion
+                                {%endif%}
+                            </td>
+                            {%if request.user.is_superuser or request.user.is_staff%}
+                                <td>
+                                    <a href="{%url 'edit_task' task.id%}">Edit </a>
+                                    &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
+                                    <a title="Mark as pending." href="{%url 'mark_task_pending' task.id%}">Pending</a>
+                                    {%if request.user.is_superuser%}
+                                        &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
+                                        <a href="{%url 'delete_task' task.id%}">Delete </a>
+                                    {%endif%}
+                                </td>
+                            {%endif%}
+                        </tr>         
+                    {%endfor%}
+
+                </tbody>
+            </table>
+            <div class="pagination">
+                <span class="step-links">
+                    {% if ctask_list.has_previous %}
+                        <a href="?page={{ ctask_list.previous_page_number }}">previous</a>
+                    {% endif %}
+
+                    <span class="current">
+                        Page {{ ctask_list.number }} of {{ ctask_list.paginator.num_pages }}.
+                    </span>
+
+                    {% if ctask_list.has_next %}
+                        <a href="?page={{ ctask_list.next_page_number }}">next</a>
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="pull-right"> 
+                <br/>
+                <a href="#top-btn">
+                    <span class="glyphicon glyphicon-arrow-up"></span>
+                </a>
+            </div>
+        {%else%}
+            No complete tasks found.
+        {%endif%}
+    </div>
+
+
+
+
+{% endblock content %}
