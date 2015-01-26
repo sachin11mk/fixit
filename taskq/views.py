@@ -103,6 +103,61 @@ def add_task(request):
     return HttpResponse(template.render(context))
 
 
+def task_details(request, task_id):
+    template = loader.get_template('task.html')
+    task = TaskQ.objects.get(id=task_id)
+    heading = ""
+    # Which Floor?
+    if task.floor == "0":
+        heading += "Ground Floor ==>"
+    elif task.floor == "1":
+        heading += "First Floor ==>"
+    elif task.floor == "2":
+        heading += "Second Floor ==>"
+    elif task.floor == "3":
+        heading += "Third Floor ==>"
+    else:
+        heading += "Pantry Area ==>"
+
+    # Which Room?
+    if task.room == "0":
+        heading += "Conf. Room "
+    elif task.room == "1":
+        heading += "Room 1 "
+    elif task.room == "2":
+        heading += "Room 2 "
+    elif task.room == "3":
+        heading += "Room 3 "
+    elif task.room == "4":
+        heading += "WC "
+    elif task.room == "5":
+        heading += "Accounts "
+    elif task.room == "6":
+        heading += "Server "
+
+    if task.status == "P":
+        status = "Pending"
+    elif task.status == "I":
+        status = "In Progress"
+    elif task.status == "C":
+        status = "Complete"
+    else:
+        status = "Not Possible"
+
+    if task.priority == "B":
+        priority = "Blocker"
+    elif task.priority == "H":
+        priority = "High"
+    elif task.priority == "M":
+        priority = "Moderate"
+    else:
+        priority = "Low"
+
+    context = RequestContext(request, {'task': task, 'heading': heading,\
+            'status': status, 'priority': priority})
+    return HttpResponse(template.render(context))
+
+
 def edit_task(request, task_id):
     template = loader.get_template('edit_task.html')
     task = TaskQ.objects.get(id=task_id)
@@ -228,6 +283,35 @@ def delete_task(request, task_id):
         messages.add_message(request, messages.error, error_msg)
         return HttpResponseRedirect(reverse('task_list'))
         #return HttpResponse(template.render(context))
+
+
+def repeat_task_log(request):
+    if request.user.is_superuser:
+        template = loader.get_template('repeat_task_log.html')
+        context = RequestContext(request, {})
+        RTL = RepeatTaskLog.objects.all()
+        rtlog_dict = {}
+        rtasks = TaskQ.objects.filter(repeatable=1)
+        for rt in rtasks:
+            rtl_list =RepeatTaskLog.objects.filter(\
+                    task_id=rt.id).order_by('task_repeat_time')
+            if not rtl_list:
+                continue
+            pass_cnt = len(rtl_list.filter(status=1))
+            total_cnt = len(rtl_list)
+            rtlog_dict.update({'%s'%rt.id: {'rtl_list': rtl_list, \
+                    'pass_cnt': pass_cnt, 'total_cnt':total_cnt}})
+
+        context = RequestContext(request, {'RTL': RTL, 'rtasks':rtasks,\
+            'rtlog_dict': rtlog_dict,
+            'active': 'rtlog'})
+        return HttpResponse(template.render(context))
+    else:
+        error_msg = "Access denied."
+        messages.add_message(request, messages.error, error_msg)
+        return HttpResponseRedirect(reverse('task_list'))
+        #return HttpResponse(template.render(context))
+
 
 
 def task_list(request):

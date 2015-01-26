@@ -109,6 +109,12 @@ def repeat_timesince(task_id):
     return time_req
 
 
+@register.simple_tag
+def show_task_desc(task_id):
+    task = TaskQ.objects.get(id=task_id)
+    return task.desc
+
+
 
 """
 @register.inclusion_tag("repeat_task_status.html", takes_context = True)

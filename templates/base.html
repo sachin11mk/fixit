@@ -50,6 +50,12 @@
                 <a href="{%url 'add_task'%}">
                 <span class="glyphicon glyphicon-plus"></span> Add</a>
             </li>
+            {% if request.user.is_superuser %}
+                <li role="presentation"  {%if active == 'rtlog' %} class="active" {%endif%}  >
+                    <a href="{%url 'repeat_task_log'%}">
+                    <span class="glyphicon glyphicon-book"></span> Repeat Logs</a>
+                </li>
+            {%endif%}
         </ul> 
     </div>
 
