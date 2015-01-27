@@ -48,7 +48,7 @@
             </li>
             <li role="presentation" id="other-list" {%if active == 'otherlist' %} class="active" {%endif%} >
                 <a  href="{%url 'other_list'%}">
-                <span class="glyphicon glyphicon-ok"></span> Other <span class="badge">{%show_other_cnt%}</span></a>
+                <span class="glyphicon glyphicon-ban-circle"></span> Other <span class="badge">{%show_other_cnt%}</span></a>
             </li>
             <li role="presentation"  {%if active == 'addtask' %} class="active" {%endif%}  >
                 <a href="{%url 'add_task'%}">
