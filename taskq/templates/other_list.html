@@ -3,37 +3,21 @@
 
 {% block content %}
 
-    <span id="top-btn" class="label label-primary" type="button">
-        Total<span class="badge">{{task_cnt}}</span>
-    </span>
-    <span>&nbsp; = </span>
-        
-    <a href="{%url 'task_list'%}" class="label label-danger" type="button">
-        Pending<span class="badge">{{pending_cnt}}</span>
-    </a>
-    
-    <span>&nbsp; + </span>
-    <a href="{%url 'completed_list'%}" class="label label-success" type="button">
-        Complete<span class="badge">{{complete_cnt}}</span>
-    </a>
-    
-    <span>&nbsp; + </span>
-    <span class="label label-info" title="In-Progress/Not possible">
-        Other<span class="badge">{{other_cnt}}</span>
-    </span>
-    
+   
 
 <!-- ++++++++++++++++  complete task  ++++++++++++++++++  --> 
 
-    <br/><br/>
     <div class="well well-lg" id="ctask-div">
+        
+        {%comment%}
         <blockquote>
             <h3 style='color:green;' title="Tasks that are marked as not possible.">
                 Other Tasks
             </h3>
         </blockquote>
+        {%endcomment%}
 
-        {%if ctask_list%}
+        {%if xtasks%}
             <table class="table table-bordered">
                 <thead>
                     {%comment%}
@@ -42,17 +26,17 @@
                     <th><h4><b>Location</b></h4></th>
                     <th><h4><b>Details</b></h4></th>
                     <th><h4><b>Priority</b></h4></th>
+                    <th><h4><b>Status</b></h4></th>
                     {%if request.user.is_superuser or request.user.is_staff%}
                         <th></th>
                     {%endif%}
                 </thead>
                 <tbody>
-                    {%for  task in other_tasks%}
+                    {%for  task in xtasks%}
                         <!-- <tr>  -->
                         <tr {%if task.repeatable %} style="border-left: solid blue 2px;"{%endif%}>
                     {%comment%}
                             <td>{{forloop.counter|add:ctask_list.next_page_number}}.</td>
-                    {%endcomment%}
                             <td>
                                 {%time_required task.id %}
 
@@ -64,6 +48,7 @@
                                 {%endif%}
 
                             </td>
+                    {%endcomment%}
                             <td>
                                 {%if task.floor == '0' %}
                                     Ground Floor     
@@ -109,6 +94,17 @@
                                         Suggestion
                                 {%endif%}
                             </td>
+
+                            <td>
+                                {%if task.status == 'I' %}
+                                        In-Progress
+                                {%endif%}
+                                {%if task.status == 'X' %}
+                                        Not Possible
+                                {%endif%}
+                            </td>
+
+
                             {%if request.user.is_superuser or request.user.is_staff%}
                                 <td>
                                     <a href="{%url 'edit_task' task.id%}">Edit Task</a>

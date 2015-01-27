@@ -114,6 +114,23 @@ def show_task_desc(task_id):
     task = TaskQ.objects.get(id=task_id)
     return task.desc
 
+@register.simple_tag
+def show_pending_cnt():
+    tasks = TaskQ.objects.filter(status='P')
+    return len(tasks)
+
+@register.simple_tag
+def show_complete_cnt():
+    tasks = TaskQ.objects.filter(status='C')
+    return len(tasks)
+
+
+@register.simple_tag
+def show_other_cnt():
+    i_tasks = TaskQ.objects.filter(status='I')
+    x_tasks = TaskQ.objects.filter(status='X')
+    return len(i_tasks) + len(x_tasks)
+
 
 
 """

@@ -7,8 +7,8 @@ from taskq.models import TaskQ, RepeatTaskLog
 from datetime import datetime, timedelta
 
 try:
-    tasks = TaskQ.objects.all()
-    repeat_tasks = tasks.filter(repeatable=True)
+    tasks = TaskQ.objects.filter(status='P')
+    repeat_tasks = tasks.filter(repeatable=True )
     for rt in repeat_tasks:
         if rt.repeat_time > datetime.now():
             # skip

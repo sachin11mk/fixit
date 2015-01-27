@@ -3,29 +3,8 @@
 
 {% block content %}
 
-    <span id="top-btn" class="label label-primary" type="button">
-        Total<span class="badge">{{task_cnt}}</span>
-    </span>
-    <span>&nbsp; = </span>
-        
-    <a href="{%url 'task_list'%}" class="label label-danger" type="button">
-        Pending<span class="badge">{{pending_cnt}}</span>
-    </a>
-    
-    <span>&nbsp; + </span>
-    <a href="#ctask-div" class="label label-success" type="button">
-        Complete<span class="badge">{{complete_cnt}}</span>
-    </a>
-    
-    <span>&nbsp; + </span>
-    <span class="label label-info" title="In-Progress/Not possible">
-        Other<span class="badge">{{other_cnt}}</span>
-    </span>
-    
-
 <!-- ++++++++++++++++  complete task  ++++++++++++++++++  --> 
 
-    <br/><br/>
     <div class="well well-lg" id="ctask-div">
         <blockquote>
             <h3 style='color:green;'>
