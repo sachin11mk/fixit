@@ -322,6 +322,8 @@ def task_list(request):
     tasks = tasks.order_by('priority')
 
     p_tasks = tasks.filter(status='P')
+    if not request.user.is_superuser:
+        p_tasks = p_tasks.exclude(repeat_time__gt=datetime.now())
 
     #
     # Pending tasks
@@ -332,6 +334,8 @@ def task_list(request):
     t4 = p_tasks.filter(priority='L')
     t5 = p_tasks.filter(priority='T')
     p_tasks = list(chain(t1, t2, t3, t4, t5))
+
+
     # Paginate pages with 10 records / page.
     paginator = Paginator(p_tasks, 10)
     page = request.GET.get('page', '1')
