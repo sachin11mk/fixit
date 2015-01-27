@@ -3,6 +3,7 @@
 
 {% block content %}
 
+{%comment%}
     <span id="top-btn" class="label label-primary" type="button">
         Total<span class="badge">{{task_cnt}}</span>
     </span>
@@ -21,13 +22,15 @@
     <a href="{%url 'other_list' %}" class="label label-info" title="In-Progress/Not possible">
         Other<span class="badge">{{other_cnt}}</span>
     </a>
+{%endcomment%}
     
-    <br/><br/>
     <div class="well well-lg" id="ptask-div">
 
+        {%comment%}
         <blockquote>
             <h3 style='color:red;'>Pending Tasks</h3>
         </blockquote>
+        {%endcomment%}
         <table class="table table-bordered">
             <thead>
                 <th><h4><b>Time</b></h4></th>
