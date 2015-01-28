@@ -337,7 +337,7 @@ def task_list(request):
 
 
     # Paginate pages with 10 records / page.
-    paginator = Paginator(p_tasks, 10)
+    paginator = Paginator(p_tasks, 100)
     page = request.GET.get('page', '1')
     try:
         ptask_list = paginator.page(page)
@@ -445,7 +445,7 @@ def completed_list(request):
     #
     c_tasks = tasks.filter(status='C')
     # Paginate pages with 10 records / page.
-    paginator = Paginator(c_tasks, 5)
+    paginator = Paginator(c_tasks, 50)
     page = request.GET.get('page', '1')
     try:
         ctask_list = paginator.page(page)

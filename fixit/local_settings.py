@@ -1,6 +1,5 @@
 
 ADMINS = (
-        ('Sachin Karambalkar', 'sachin.karambalkar@coriolis.co.in'),
 )
 
 APPEND_SLASH=True # default is true.
