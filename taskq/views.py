@@ -437,6 +437,7 @@ def task_list(request):
 
     context = RequestContext(request, {
                 'tasks':tasks,\
+                'p_tasks': p_tasks,\
                 'itask_list':itask_list, 'ntask_list':ntask_list, \
                 'ctask_list':ctask_list, 'ptask_list': ptask_list, \
                 'task_cnt': task_cnt, 'pending_cnt': pending_cnt,\
@@ -472,7 +473,7 @@ def completed_list(request):
     #
     # Complete tasks
     #
-    c_tasks = tasks.filter(status='C')
+    c_tasks = tasks.filter(status='C').order_by('-completed')
     # Paginate pages with 10 records / page.
     paginator = Paginator(c_tasks, 5)
     page = request.GET.get('page', '1')
@@ -515,6 +516,7 @@ def completed_list(request):
 
     context = RequestContext(request, {
                 'tasks':tasks,\
+                'c_tasks': c_tasks,
                 'ctask_list':ctask_list, \
                 'task_cnt': task_cnt, 'pending_cnt': pending_cnt,\
                 'complete_cnt': complete_cnt, 'progress_cnt':progress_cnt,\

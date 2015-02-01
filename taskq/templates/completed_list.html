@@ -15,7 +15,7 @@
                 </span>
             </h4>
 
-        {%if ctask_list%}
+        {%if c_tasks%}
             <table class="table table-bordered">
                 <thead>
                     {%comment%}
@@ -30,7 +30,7 @@
                     {%endif%}
                 </thead>
                 <tbody>
-                    {%for  task in ctask_list%}
+                    {%for  task in c_tasks%}
                         <!-- <tr>  -->
                         <tr {%if task.repeatable %} style="border-left: solid blue 2px;"{%endif%}>
                     {%comment%}
@@ -79,6 +79,8 @@
 
                 </tbody>
             </table>
+
+{%comment%}
             <div class="pagination">
                 <span class="step-links">
                     {% if ctask_list.has_previous %}
@@ -94,13 +96,16 @@
                     {% endif %}
                 </span>
             </div>
+{%endcomment%}
 
+            <br/>
             <div class="pull-right"> 
                 <br/>
                 <a href="#top-btn">
                     <span class="glyphicon glyphicon-arrow-up"></span>
                 </a>
             </div>
+            <br/>
         {%else%}
             No complete tasks found.
         {%endif%}

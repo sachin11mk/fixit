@@ -21,7 +21,7 @@
                 {%endif%}
             </thead>
             <tbody>
-                {%for  task in ptask_list%}
+                {%for  task in p_tasks%}
                     <tr {%if task.repeatable %} style="border-left: solid blue 2px;"{%endif%}>
                         <td width="12%">
                             <small>
@@ -72,6 +72,8 @@
 
             </tbody>
         </table>
+
+{%comment%}
         <div class="pagination">
             <span class="step-links">
                 {% if ptask_list.has_previous %}
@@ -87,12 +89,16 @@
                 {% endif %}
             </span>
         </div>
+{%endcomment%}
+        
+        <br/>
         <div class="pull-right"> 
             <br/>
             <a href="#top-btn">
                 <span class="glyphicon glyphicon-arrow-up"></span>
             </a>
         </div>
+        <br/>
 
     </div>
 
