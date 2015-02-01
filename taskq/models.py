@@ -9,6 +9,7 @@ FLOOR_CHOICES = (
         ('2', 'Second'),
         ('3', 'Third'),
         ('4', 'Pantry'),
+        ('5', 'All'),
 )
 
 ROOM_CHOICES = (
@@ -20,6 +21,7 @@ ROOM_CHOICES = (
         ('4', 'WC'),
         ('5', 'Accounts'),
         ('6', 'Server'),
+        ('7', 'Lunch area'),
 )
 
 STATUS_CHOICES = (

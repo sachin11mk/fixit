@@ -10,12 +10,12 @@
         {%endcomment%}
         <table class="table table-bordered">
             <thead>
-                <th><h4><b>Time</b></h4></th>
+                <th width="12%"><h4><b>Time</b></h4></th>
                 {%comment%}
                 {%endcomment%}
-                <th><h4><b>Location</b></h4></th>
-                <th><h4><b>Details</b></h4></th>
-                <th><h4><b>Priority</b></h4></th>
+                <th width="18%"><h4><b>Location</b></h4></th>
+                <th width="42%"><h4><b>Details</b></h4></th>
+                <th width="8%"><h4><b>Priority</b></h4></th>
                 {%if request.user.is_superuser or request.user.is_staff%}
                     <th></th>
                 {%endif%}
@@ -23,7 +23,7 @@
             <tbody>
                 {%for  task in ptask_list%}
                     <tr {%if task.repeatable %} style="border-left: solid blue 2px;"{%endif%}>
-                        <td>
+                        <td width="12%">
                             <small>
                                 {% if task.repeatable %}
                                     &nbsp;
@@ -40,69 +40,30 @@
                 {%comment%}
                         <td>{{forloop.counter|add:ptask_list.next_page_number}}.</td>
                 {%endcomment%}
-                        <td>
-                            {%if task.floor == '0' %}
-                                Ground Floor
-                            {%elif task.floor == '1' %}
-                                First Floor
-                            {%elif task.floor == '2' %}
-                                Second Floor
-                            {%elif task.floor == '3' %}
-                                Third Floor
-                            {%elif task.floor == '4' %}
-                                Pantry
-                            {%endif%}
-                            =&gt;
-                            {%if task.room == '0' %}
-                                Conference     
-                            {%elif task.room == '1' %}
-                                Room 1 
-                            {%elif task.room == '2' %}
-                                Room 2 
-                            {%elif task.room == '3' %}
-                                Room 3 
-                            {%elif task.room == '4' %}
-                                WC 
-                            {%elif task.room == '5' %}
-                                Accounts 
-                            {%elif task.room == '6' %}
-                                Server
-                            {%endif%}
+                        <td width="18%">
+                            {% show_location task%}
                         </td>
-                        <td title="{{task.desc}}">
-                            {{task.desc|truncatechars:60}}
+                        <td width="42%" title="{{task.desc}}">
+                            {#{task.desc|truncatechars:60}#}
+                            {{task.desc}}
                         </td>
-                        <td>
-                            {%if task.priority == 'B' %}
-                                <span class="bg-blocker">
-                                    Blocker
-                                </span>
-                            {%elif task.priority == 'H' %}
-                                <span class="bg-high">
-                                    High
-                                </span>
-                            {%elif task.priority == 'M' %}
-                                <span class="bg-moderate">
-                                    Moderate
-                                </span>
-                            {%elif task.priority == 'L' %}
-                                <span class="bg-low">
-                                    Low
-                                </span>
-                            {%elif task.priority == 'T' %}
-                                <span class="bg-low">
-                                    Suggestion
-                                </span>
-                            {%endif%}
+                        <td width="8%">
+                            {% show_pending_priority task %}
                         </td>
                         {%if request.user.is_superuser or request.user.is_staff%}
                             <td>
+                                <!-- Edit link -->
                                 <a href="{%url 'edit_task' task.id%}">Edit </a>
                                 &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
+
+                                <!-- Done link -->
                                 <a title="Mark as done." href="{%url 'mark_task_complete' task.id%}">Done</a>
+                                
+                                <!-- Delete link -->
                                 {%if request.user.is_superuser%}
                                     &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
-                                    <a href="{%url 'delete_task' task.id%}">Delete </a>
+                                    <a id="id-del-task" href="{%url 'delete_task' task.id%}">
+                                    <span class="glyphicon glyphicon-trash"></span></a>
                                 {%endif%}
                             </td>
                         {%endif%}
@@ -135,6 +96,19 @@
 
     </div>
 
-
-
 {% endblock content %}
+
+
+{% block extra_js %}
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('a#id-del-task').click(function(e){
+                var msg = "Do you want to delete task?"
+                var isDelete = window.confirm(msg);
+                if ( isDelete != true )
+                    e.preventDefault();
+                $(this).closest('form').trigger('submit');
+            });
+        });
+    </script>
+{% endblock extra_js %}

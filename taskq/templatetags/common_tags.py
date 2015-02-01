@@ -95,6 +95,9 @@ def pending_timesince(task_id):
         time_req += "%sm "%deltaMinutes
     if deltaSeconds and not time_req:
         time_req += "1 minute"
+
+    if not time_req:
+        return "1 minute"
     return time_req
 
 
@@ -165,4 +168,74 @@ def show_other_cnt():
     i_tasks = TaskQ.objects.filter(status='I')
     x_tasks = TaskQ.objects.filter(status='X')
     return len(i_tasks) + len(x_tasks)
+
+
+@register.simple_tag
+def show_location(task):
+    location = ""
+    if task.floor == '0':
+        location = "Ground Floor"
+    elif task.floor == '1':
+        location = "First Floor"
+    elif task.floor == '2':
+        location = "Second Floor"
+    elif task.floor == '3':
+        location = "Third Floor"
+    elif task.floor == '4':
+        location = "Pantry"
+    else:
+        location = "All"
+
+    location += " => "
+
+    if task.room == '0':
+        location += "Conference"
+    elif task.room == '1':
+        location += "Room 1"
+    elif task.room == '2':
+        location += "Room 2"
+    elif task.room == '3':
+        location += "Room 3"
+    elif task.room == '4':
+        location += "WC"
+    elif task.room == '5':
+        location += "Accounts"
+    elif task.room == '6':
+        location += "Server"
+    else:
+        location += "Lunch area"
+    return location
+
+
+@register.simple_tag
+def show_priority(task):
+    priority = ""
+    if task.priority == 'B':
+        priority="Blocker"
+    elif task.priority == 'H':
+        priority="High"
+    elif task.priority == 'M':
+        priority="Moderate"
+    elif task.priority == 'L':
+        priority="Low"
+    else:
+        priority="Suggestion"
+    return priority
+
+
+@register.simple_tag
+def show_pending_priority(task):
+    priority = ""
+    if task.priority == 'B':
+        priority="<span class='bg-blocker'>Blocker</span>"
+    elif task.priority == 'H':
+        priority="<span class='bg-high'>High</span>"
+    elif task.priority == 'M':
+        priority="<span class='bg-moderate'>Moderate</span>"
+    elif task.priority == 'L':
+        priority="<span class='bg-low'>Low</span>"
+    else:
+        priority="<span class='bg-low'>Suggestion</span>"
+    return priority
+
 

@@ -51,6 +51,7 @@ def add_task(request):
         form = TaskForm(request.POST)
         if request.user.is_superuser or request.user.is_staff:
             form = TaskAdminForm(request.POST)
+
         if form.is_valid():
             data = {}
             data['floor'] = form.cleaned_data['floor']
