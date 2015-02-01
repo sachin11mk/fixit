@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, url
 from taskq import views
+from taskq.views import OtherList
 
 urlpatterns = patterns( '',
     url(r'^add/$', views.add_task, name='add_task'),
@@ -13,5 +14,6 @@ urlpatterns = patterns( '',
     url(r'^task/(?P<task_id>\w+)/$', views.task_details, name='task_details'),
     url(r'^clist/$', views.completed_list, name='completed_list'),
     url(r'^other/$', views.other_list, name='other_list'),
+    #url(r'^other/$', OtherList.as_view(), name='other_list'),
     url(r'^rtlog/$', views.repeat_task_log, name='repeat_task_log'),
 )

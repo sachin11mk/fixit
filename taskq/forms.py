@@ -5,55 +5,6 @@ from models import FLOOR_CHOICES, ROOM_CHOICES
 from models import STATUS_CHOICES, PRIORITY_CHOICES
 from datetime import datetime
 
-"""  Radio Fields
-class TaskForm(forms.ModelForm):
-    floor = forms.ChoiceField(label='Floor',
-                required=True,
-                widget=forms.RadioSelect(attrs={'class': '',
-                'placeholder': 'Select Floor'}), choices=FLOOR_CHOICES )
-
-    room = forms.ChoiceField(label='Room',
-                required=True,
-                widget=forms.RadioSelect(attrs={'class': '',
-                'placeholder': 'Select Room'}), choices=ROOM_CHOICES )
-
-    desc = forms.CharField(label='Description',
-                required=True,
-                widget=forms.Textarea(attrs={'class': '', 'rows': '5',\
-                'cols': '80',
-                'placeholder': 'Enter Problem Statement'}), )
-
-    priority = forms.ChoiceField(label='Priority',
-                required=True,
-                widget=forms.RadioSelect(attrs={'class': '',
-                'placeholder': 'Select Task Priority'}), choices=PRIORITY_CHOICES )
-
-    class Meta:
-        model = TaskQ
-        exclude = ('created', 'modified', 'status',)
-
-    def clean(self):
-        return self.cleaned_data
-
-
-
-class TaskAdminForm(TaskForm):
-    status = forms.ChoiceField(label='Status',
-                required=True,
-                widget=forms.RadioSelect(attrs={'class': '',
-                'placeholder': 'Select Status'}), choices=STATUS_CHOICES )
-    class Meta:
-        model = TaskQ
-        exclude = ('created', 'modified',)
-
-    def clean(self):
-        return self.cleaned_data
-
-"""
-
-
-
-
 class TaskForm(forms.ModelForm):
 
     floor = forms.CharField(label='Floor',
@@ -92,7 +43,6 @@ class TaskForm(forms.ModelForm):
                 'placeholder': 'Schedule Task @'}),
                 error_messages={})
                     #'required': 'Repeat time field can not be empty'} )
-
 
     class Meta:
         model = TaskQ
@@ -133,7 +83,6 @@ class TaskForm(forms.ModelForm):
 
     def clean(self):
         return self.cleaned_data
-
 
 
 class TaskAdminForm(TaskForm):

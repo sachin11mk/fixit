@@ -119,7 +119,6 @@ def update_task(instance=None, **kwargs):
     return task
 
 
-
 class RepeatTaskLog(models.Model):
     task_id = models.IntegerField()
     task_repeat_time = models.DateTimeField()

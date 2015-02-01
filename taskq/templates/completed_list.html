@@ -6,16 +6,14 @@
 <!-- ++++++++++++++++  complete task  ++++++++++++++++++  --> 
 
     <div class="well well-lg" id="ctask-div">
-        <blockquote>
-            <h3 style='color:green;'>
+            <h4 style='color:green;'>
                 Completed Tasks
                 <span class="pull-right">
                     <small title="{{week_done_cnt}} out of {{week_cnt}} tasks complete.">
                         <i style="font-size:14px;">Weekly Fixit Rate: {{task_done_rate}}</i>
                     </small>
                 </span>
-            </h3>
-        </blockquote>
+            </h4>
 
         {%if ctask_list%}
             <table class="table table-bordered">
