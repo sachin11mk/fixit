@@ -26,6 +26,21 @@ TEMPLATE_DEBUG = DEBUG
 
 ALLOWED_HOSTS = ['*']
 
+GOOGLE_OAUTH2_CLIENT_ID='1077258824046-lsb9thgrb61tlb0mamd2v4spaedvuot7.apps.googleusercontent.com'
+GOOGLE_OAUTH2_CLIENT_SECRET='9rNLn87nP8gkhi6qFr88sjLs'
+#GOOGLE_OAUTH2_EXTRA_ARGUMENTS = {'hd': 'coriolis.co.in'}
+#SOCIAL_AUTH_GoogleOAuth2Backend_WHITELISTED_DOMAINS = ['coriolis.co.in']
+GOOGLE_WHITE_LISTED_DOMAINS = ['coriolis.co.in']
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+AUTHENTICATION_BACKENDS = (
+   'social_auth.backends.google.GoogleOAuth2Backend',
+   'django.contrib.auth.backends.ModelBackend',
+)
+LOGIN_URL          = '/login/google-oauth2/'
+LOGIN_ERROR_URL    = '/task/list/'
+LOGIN_REDIRECT_URL = "/task/list/"
+SOCIAL_AUTH_LOGIN_REDIRECT_URL="/task/list/"
+
 
 # Application definition
 
@@ -39,6 +54,7 @@ DEFAULT_APPS = (
 )
 
 THIRD_PARTY_APPS = (
+    'social_auth',
 )
 
 CUSTOM_APPS = (
@@ -51,6 +67,7 @@ INSTALLED_APPS = DEFAULT_APPS + THIRD_PARTY_APPS + CUSTOM_APPS
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'fixit.middleware.CustomSocialAuthExceptionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
@@ -96,6 +113,8 @@ USE_TZ = False  #True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
+BASE = os.path.abspath(os.path.dirname(__name__))
+
 STATIC_URL = '/static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
@@ -113,6 +132,10 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.tz",
     "django.contrib.messages.context_processors.messages",
     "django.core.context_processors.request",
+    'social_auth.context_processors.social_auth_by_name_backends',
+    'social_auth.context_processors.social_auth_backends',
+    'social_auth.context_processors.social_auth_by_type_backends',
+    'social_auth.context_processors.social_auth_login_redirect',
 )
 
 

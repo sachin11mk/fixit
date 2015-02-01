@@ -3,7 +3,6 @@
 
 {% block content %}
 
-   
 
 <!-- ++++++++++++++++  complete task  ++++++++++++++++++  --> 
 
@@ -23,10 +22,10 @@
                     {%comment%}
                     <th>#</th>
                     {%endcomment%}
-                    <th><h4><b>Location</b></h4></th>
-                    <th><h4><b>Details</b></h4></th>
-                    <th><h4><b>Priority</b></h4></th>
-                    <th><h4><b>Status</b></h4></th>
+                    <th width="18%"><h4><b>Location</b></h4></th>
+                    <th width="42%"><h4><b>Details</b></h4></th>
+                    <th width="8%"><h4><b>Priority</b></h4></th>
+                    <th width="12%"><h4><b>Status</b></h4></th>
                     {%if request.user.is_superuser or request.user.is_staff%}
                         <th></th>
                     {%endif%}
@@ -49,55 +48,20 @@
 
                             </td>
                     {%endcomment%}
-                            <td>
-                                {%if task.floor == '0' %}
-                                    Ground Floor     
-                                {%elif task.floor == '1' %}
-                                    First Floor
-                                {%elif task.floor == '2' %}
-                                    Second Floor
-                                {%elif task.floor == '3' %}
-                                    Third Floor
-                                {%elif task.floor == '4' %}
-                                    Pantry
-                                {%endif%}
-                                =&gt;
-                                {%if task.room == '0' %}
-                                    Conference     
-                                {%elif task.room == '1' %}
-                                    Room 1 
-                                {%elif task.room == '2' %}
-                                    Room 2 
-                                {%elif task.room == '3' %}
-                                    Room 3 
-                                {%elif task.room == '4' %}
-                                    WC 
-                                {%elif task.room == '5' %}
-                                    Accounts 
-                                {%elif task.room == '6' %}
-                                    Server
-                                {%endif%}
+                            <td width="18%">
+                                {% show_location task %}
                             </td>
-                            <td title="{{task.desc}}">
-                                {{task.desc|truncatechars:60}}
+                            <td width="42%" title="{{task.desc}}">
+                                {#{task.desc|truncatechars:60}#}
+                                {{task.desc}}
                             </td>
-                            <td style='color:green;'>
-                                {%if task.priority == 'B' %}
-                                        Blocker
-                                {%elif task.priority == 'H' %}
-                                        High
-                                {%elif task.priority == 'M' %}
-                                        Moderate
-                                {%elif task.priority == 'L' %}
-                                        Low
-                                {%elif task.priority == 'T' %}
-                                        Suggestion
-                                {%endif%}
+                            <td width="8%" style='color:green;'>
+                                {% show_priority task %}
                             </td>
 
-                            <td>
+                            <td width="12%">
                                 {%if task.status == 'I' %}
-                                        In-Progress
+                                        In Progress
                                 {%endif%}
                                 {%if task.status == 'X' %}
                                         Not Possible
@@ -107,9 +71,19 @@
 
                             {%if request.user.is_superuser or request.user.is_staff%}
                                 <td>
-                                    <a href="{%url 'edit_task' task.id%}">Edit Task</a>
+                                    <!-- Edit link -->
+                                    <a href="{%url 'edit_task' task.id%}">Edit</a>
                                     &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
+
+                                    <!-- Pending link -->
                                     <a title="Mark as pending." href="{%url 'mark_task_pending' task.id%}">Pending</a>
+
+                                    <!-- Delete link -->
+                                    {%if request.user.is_superuser%}
+                                        &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
+                                        <a id="id-del-task" href="{%url 'delete_task' task.id%}">
+                                        <span class="glyphicon glyphicon-trash"></span></a>
+                                    {%endif%}
                                 </td>
                             {%endif%}
                         </tr>         
@@ -120,7 +94,19 @@
         {%endif%}
     </div>
 
-
-
-
 {% endblock content %}
+
+
+{% block extra_js %}
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('a#id-del-task').click(function(e){
+                var msg = "Do you want to delete task?"
+                var isDelete = window.confirm(msg);
+                if ( isDelete != true )
+                    e.preventDefault();
+                $(this).closest('form').trigger('submit');
+            });
+        });
+    </script>
+{% endblock extra_js %}

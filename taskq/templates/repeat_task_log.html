@@ -3,14 +3,9 @@
 
 {% block content %}
 
-    <br/><br/>
     <div class="well well-lg" id="ptask-div">
-
-        <blockquote>
-            <h3 style='color:red;'>Repeatable Task Log</h3>
-        </blockquote>
-
-
+        <h4 style='color:red;'>Repeatable Task Log</h4>
+        <hr/>
         {% for key, RT in rtlog_dict.iteritems %}
             <a href="{%url 'task_details' key %}" title="{% show_task_desc key%}"
             >Task-{{key}}</a>

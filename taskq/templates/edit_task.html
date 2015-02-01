@@ -89,11 +89,17 @@
     <script src="{{STATIC_URL}}js/jquery-clockpicker.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function(){
+            
+            if( $('#id_repeatable').is(':checked')){
+                $('#repeat-time-div').css('display', 'block');
+            }
+
             $('#id_repeatable').click(function(){
                 if( $(this).is(':checked')){
                     $('#repeat-time-div').css('display', 'block');
                     $('.clockpicker').clockpicker({
-                        'donetext': 'Done',
+                        //'donetext': 'Done',
+                        autoclose: true,
                     });
                 }
                 else {
