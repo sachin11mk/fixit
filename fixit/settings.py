@@ -26,16 +26,21 @@ TEMPLATE_DEBUG = DEBUG
 
 ALLOWED_HOSTS = ['*']
 
-GOOGLE_OAUTH2_CLIENT_ID='1077258824046-lsb9thgrb61tlb0mamd2v4spaedvuot7.apps.googleusercontent.com'
-GOOGLE_OAUTH2_CLIENT_SECRET='9rNLn87nP8gkhi6qFr88sjLs'
-#GOOGLE_OAUTH2_EXTRA_ARGUMENTS = {'hd': 'coriolis.co.in'}
+#GOOGLE_OAUTH2_CLIENT_ID='1077258824046-lsb9thgrb61tlb0mamd2v4spaedvuot7.apps.googleusercontent.com'
+#GOOGLE_OAUTH2_CLIENT_SECRET='9rNLn87nP8gkhi6qFr88sjLs'
+GOOGLE_OAUTH2_CLIENT_ID='954877994637-ut32rg4kd31tf4ea85i8t3i4hdp7cf28.apps.googleusercontent.com'
+GOOGLE_OAUTH2_CLIENT_SECRET='oIHMIDDnxCbTkkewKeC3wbBS'
+
+# for company domain emails
 #SOCIAL_AUTH_GoogleOAuth2Backend_WHITELISTED_DOMAINS = ['coriolis.co.in']
 GOOGLE_WHITE_LISTED_DOMAINS = ['coriolis.co.in']
+GOOGLE_WHITE_LISTED_EMAILS = ['bablu.bhandari@gmail.com']
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 AUTHENTICATION_BACKENDS = (
    'social_auth.backends.google.GoogleOAuth2Backend',
    'django.contrib.auth.backends.ModelBackend',
 )
+
 LOGIN_URL          = '/login/google-oauth2/'
 LOGIN_ERROR_URL    = '/task/list/'
 LOGIN_REDIRECT_URL = "/task/list/"
