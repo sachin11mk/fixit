@@ -29,9 +29,12 @@ def show_admin_user(context):
         if request.user.is_superuser or request.user.is_staff:
             is_admin = True
             username = request.user.username
+        else:
+            username = request.user.first_name
     except Exception, msg:
         pass
-    return {'is_admin': is_admin, 'username' : username }
+    return {'is_admin': is_admin, 'username' : username, 'is_auth':\
+            request.user.is_authenticated }
 
 
 @register.simple_tag

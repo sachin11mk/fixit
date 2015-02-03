@@ -1,23 +1,33 @@
 
-{% if is_admin %}
-    
+{% if is_auth %}
     <div class="pull-right" style="color:#FFF;test-decoration:none;">
         <br/><br/>
         <a href="#" style="color:#FFF;">
             <span class="glyphicon glyphicon-user"></span>
             {{username|upper}}
         </a>
-
         <span>&nbsp;|&nbsp;</span>
 
-        {% url "admin_logout" as admin_logout %}
-        <span class="glyphicon glyphicon-off"></span>
-        <a href="{{admin_logout}}" style="color:#FFF;"
-            title="LOGOUT">LOGOUT</a>
+        {% if is_admin %}
+            {% url "admin_logout" as admin_logout %}
+                <span class="glyphicon glyphicon-off"></span>
+                <a href="{{admin_logout}}" style="color:#FFF;" title="LOGOUT">LOGOUT</a>
+        {%else%}
+            {% url "admin_logout" as admin_logout %}
+                <span class="glyphicon glyphicon-off"></span>
+                <a href="{{admin_logout}}" style="color:#FFF;" title="LOGOUT">LOGOUT</a>
+
+        {%endif%}
     </div>
-
-
 {% else %}
+    <a href='{% url "socialauth_begin" "google-oauth2" %}'>
+        <span class="pull-right" 
+            style="color:#FFF;test-decoration:none;"><i>G+ Login</i> </span>
+    </a>
+{% endif %}
+
+
+{%comment%}
     {{request.user}}
     {{request}}
     {% url "admin_login" as admin_login %}
@@ -39,5 +49,5 @@
 
        <input type="hidden" name="next" value="{{ next }}" />
     </form>
-{% endif %}
+{%endcomment%}
 
