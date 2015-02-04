@@ -53,17 +53,19 @@
                         {%if request.user.is_superuser or request.user.is_staff%}
                             <td>
                                 <!-- Edit link -->
-                                <a href="{%url 'edit_task' task.id%}">Edit </a>
+                                <a href="{%url 'edit_task' task.id%}">
+                                    <span title="Edit" class="glyphicon glyphicon-pencil"></span></a>
                                 &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
 
                                 <!-- Done link -->
-                                <a title="Mark as done." href="{%url 'mark_task_complete' task.id%}">Done</a>
+                                <a title="Mark as done." href="{%url 'mark_task_complete' task.id%}">
+                                    <span title="Done" class="glyphicon glyphicon-ok"></span></a>
                                 
                                 <!-- Delete link -->
                                 {%if request.user.is_superuser%}
                                     &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
                                     <a id="id-del-task" href="{%url 'delete_task' task.id%}">
-                                    <span class="glyphicon glyphicon-trash"></span></a>
+                                    <span title="Delete" class="glyphicon glyphicon-trash"></span></a>
                                 {%endif%}
                             </td>
                         {%endif%}

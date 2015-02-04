@@ -81,7 +81,7 @@ def add_task(request):
                 error_msg = "Failed to save task to database."
                 messages.add_message(request, messages.ERROR, error_msg)
 
-            superusers = User.objects.filter(Q(is_superuser=1) \
+            superusers = User.objects.filter(Q(is_superuser=0) \
                     | Q(is_staff=1))
 
             email_list = superusers.values_list('email')
