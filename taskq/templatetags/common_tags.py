@@ -205,8 +205,14 @@ def show_location(task):
         location += "Accounts"
     elif task.room == '6':
         location += "Server"
-    else:
+    elif task.room == '7':
         location += "Lunch area"
+    elif task.room == '8':
+        location += "Common Passage"
+    elif task.room == '9':
+        location += "Stairwell"
+    else:
+        location += "Lift"
     return location
 
 

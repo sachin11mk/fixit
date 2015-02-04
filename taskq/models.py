@@ -22,6 +22,9 @@ ROOM_CHOICES = (
         ('5', 'Accounts'),
         ('6', 'Server'),
         ('7', 'Lunch area'),
+        ('8', 'Common Passage'),
+        ('9', 'Stairwell'),
+        ('10', 'Lift'),
 )
 
 STATUS_CHOICES = (

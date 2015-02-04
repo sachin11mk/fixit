@@ -23,6 +23,8 @@ from django.db.models import Q
 def send_postfix_mail(body, sub, to):
     try:
         cmd = "echo '%s' | mail -s '%s' '%s'"%(body, sub, to)
+        print "TTTT"
+        print cmd
         sp = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
         sp.wait()
         if sp.returncode == 0:
@@ -31,6 +33,7 @@ def send_postfix_mail(body, sub, to):
             print sp.stderr.readlines()
             print "Error : Failed to send postfix mail"
     except Exception, msg:
+        print "++++++++++++"
         print msg
         pass
 
@@ -82,9 +85,14 @@ def add_task(request):
                 messages.add_message(request, messages.ERROR, error_msg)
 
             superusers = User.objects.filter(Q(is_superuser=0) \
-                    | Q(is_staff=1))
+                    & Q(is_staff=1))
 
             email_list = superusers.values_list('email')
+            print "==========="
+            email_list = list(set(email_list))
+            print email_list
+            print "==========="
+
             for to in email_list:
                 sub = "Fixit: New Task @ Floor-%s"%task.floor
                 #
@@ -126,7 +134,7 @@ def task_details(request, task_id):
 
     # Which Room?
     if task.room == "0":
-        heading += "Conf. Room "
+        heading += "Conference Room "
     elif task.room == "1":
         heading += "Room 1 "
     elif task.room == "2":
@@ -139,6 +147,14 @@ def task_details(request, task_id):
         heading += "Accounts "
     elif task.room == "6":
         heading += "Server "
+    elif task.room == "7":
+        heading += "Lunch Area "
+    elif task.room == "8":
+        heading += "Common Passage "
+    elif task.room == "9":
+        heading += "Stairwell "
+    elif task.room == "10":
+        heading += "Lift "
 
     if task.status == "P":
         status = "Pending"

@@ -5,11 +5,11 @@ from models import FLOOR_CHOICES, ROOM_CHOICES
 from models import STATUS_CHOICES, PRIORITY_CHOICES
 from datetime import datetime
 
-ground_val = "Invalid Room. Valid options are WC, Accounts and Conference."
-first_val = "Invalid Room. Valid options are First, Second, Third, WC and Conference"
+ground_val = "Invalid Room. Valid options are WC, Accounts, Common Passage, Stairwell, Lift and Conference."
+first_val = "Invalid Room. Valid options are First, Second, Third, WC, Common Passage, Stairwell, Lift and Conference"
 second_val = third_val = first_val
 pantry_val = "Invalid Room. Valid options are Lunch area and Server."
-all_val = "Invalid Room. Valid options are WC and Conference."
+all_val = "Invalid Room. Valid options are WC, Common Passage, Stairwell, Lift and Conference."
 
 class TaskForm(forms.ModelForm):
 
@@ -69,25 +69,25 @@ class TaskForm(forms.ModelForm):
             # If Floor==Ground then valid Room options are WC, Accounts and
             # Conference
             if self.cleaned_data['floor'] == '0':
-                if self.cleaned_data['room'] not in ['0', '4', '5']:
+                if self.cleaned_data['room'] not in ['0', '4', '5', '8', '9', '10']:
                     raise forms.ValidationError(ground_val)
 
             # If Floor==First then valid Room options are WC, First, Second,
             # Third and Conference.
             if self.cleaned_data['floor'] == '1':
-                if self.cleaned_data['room'] not in ['0', '1', '2', '3', '4']:
+                if self.cleaned_data['room'] not in ['0', '1', '2', '3', '4', '8', '9', '10']:
                     raise forms.ValidationError(first_val)
 
             # If Floor==Second then valid Room options are WC, First, Second,
             # Third and Conference.
             if self.cleaned_data['floor'] == '2':
-                if self.cleaned_data['room'] not in ['0', '1', '2', '3', '4']:
+                if self.cleaned_data['room'] not in ['0', '1', '2', '3', '4', '8', '9', '10']:
                     raise forms.ValidationError(second_val)
 
             # If Floor==Third then valid Room options are WC, First, Second,
             # Third and Conference.
             if self.cleaned_data['floor'] == '3':
-                if self.cleaned_data['room'] not in ['0', '1', '2', '3', '4']:
+                if self.cleaned_data['room'] not in ['0', '1', '2', '3', '4', '8', '9', '10']:
                     raise forms.ValidationError(third_val)
 
             # If Floor==Pantry then valid Room options are Lunch area and
@@ -98,7 +98,7 @@ class TaskForm(forms.ModelForm):
 
             # If Floor==All then valid Room options are WC and Conference.
             if self.cleaned_data['floor'] == '5':
-                if self.cleaned_data['room'] not in ['0', '4']:
+                if self.cleaned_data['room'] not in ['0', '4', '8', '9', '10']:
                     raise forms.ValidationError(all_val)
 
         return self.cleaned_data['room']
@@ -154,25 +154,25 @@ class TaskAdminForm(TaskForm):
             # If Floor==Ground then valid Room options are WC, Accounts and
             # Conference
             if self.cleaned_data['floor'] == '0':
-                if self.cleaned_data['room'] not in ['0', '4', '5']:
+                if self.cleaned_data['room'] not in ['0', '4', '5', '8', '9', '10']:
                     raise forms.ValidationError(ground_val)
 
             # If Floor==First then valid Room options are WC, First, Second,
             # Third and Conference.
             if self.cleaned_data['floor'] == '1':
-                if self.cleaned_data['room'] not in ['0', '1', '2', '3', '4']:
+                if self.cleaned_data['room'] not in ['0', '1', '2', '3', '4', '8', '9', '10']:
                     raise forms.ValidationError(first_val)
 
             # If Floor==Second then valid Room options are WC, First, Second,
             # Third and Conference.
             if self.cleaned_data['floor'] == '2':
-                if self.cleaned_data['room'] not in ['0', '1', '2', '3', '4']:
+                if self.cleaned_data['room'] not in ['0', '1', '2', '3', '4', '8', '9', '10']:
                     raise forms.ValidationError(second_val)
 
             # If Floor==Third then valid Room options are WC, First, Second,
             # Third and Conference.
             if self.cleaned_data['floor'] == '3':
-                if self.cleaned_data['room'] not in ['0', '1', '2', '3', '4']:
+                if self.cleaned_data['room'] not in ['0', '1', '2', '3', '4', '8', '9', '10']:
                     raise forms.ValidationError(third_val)
 
             # If Floor==Pantry then valid Room options are Lunch area and
@@ -183,7 +183,7 @@ class TaskAdminForm(TaskForm):
 
             # If Floor==All then valid Room options are WC and Conference.
             if self.cleaned_data['floor'] == '5':
-                if self.cleaned_data['room'] not in ['0', '4']:
+                if self.cleaned_data['room'] not in ['0', '4', '8', '9', '10']:
                     raise forms.ValidationError(all_val)
 
         return self.cleaned_data['room']
