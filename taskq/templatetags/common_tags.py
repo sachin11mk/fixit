@@ -40,7 +40,10 @@ def show_admin_user(context):
 @register.simple_tag
 def time_required(task_id):
     task = TaskQ.objects.get(id=task_id)
-    open_time = task.created
+    if task.repeatable:
+        open_time = task.repeat_time
+    else:
+        open_time = task.created
     close_time = task.completed
     try:
         delta = close_time - open_time
