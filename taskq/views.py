@@ -360,10 +360,10 @@ def task_list(request):
     template = loader.get_template('task_list.html')
     p_tasks =  i_tasks = n_tasks = c_tasks = []
     tasks = TaskQ.objects.all()
-
     tasks = tasks.order_by('priority')
 
     p_tasks = tasks.filter(status='P')
+    progress = tasks.filter(status='I')
     if not request.user.is_superuser:
         p_tasks = p_tasks.exclude(repeat_time__gt=datetime.now())
 
@@ -375,8 +375,11 @@ def task_list(request):
     t3 = p_tasks.filter(priority='M')
     t4 = p_tasks.filter(priority='L')
     t5 = p_tasks.filter(priority='T')
-    p_tasks = list(chain(t1, t2, t3, t4, t5))
+    tp_tasks = list(chain(t1, t2, t3, t4, t5))
 
+    pending = tp_tasks
+
+    p_tasks = list(chain(progress, pending))
 
     # Paginate pages with 10 records / page.
     paginator = Paginator(p_tasks, 100)
@@ -390,23 +393,6 @@ def task_list(request):
         # If page is out of range (e.g. 9999),
         # deliver last page of results.
         ptask_list = paginator.page(paginator.num_pages)
-
-    #
-    # Complete tasks
-    #
-    c_tasks = tasks.filter(status='C')
-    # Paginate pages with 10 records / page.
-    paginator = Paginator(c_tasks, 5)
-    page = request.GET.get('page', '1')
-    try:
-        ctask_list = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        ctask_list = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999),
-        # deliver last page of results.
-        ctask_list = paginator.page(paginator.num_pages)
 
 
     #
@@ -427,38 +413,14 @@ def task_list(request):
         itask_list = paginator.page(paginator.num_pages)
 
 
-    #
-    # Not possible tasks
-    #
-    n_tasks = tasks.filter(status='X')
-    # Paginate pages with 10 records / page.
-    paginator = Paginator(n_tasks, 5)
-    page = request.GET.get('page', '1')
-    try:
-        ntask_list = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        ntask_list = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999),
-        # deliver last page of results.
-        ntask_list = paginator.page(paginator.num_pages)
-
     task_cnt = len(tasks)
     pending_cnt = len(p_tasks)
-    complete_cnt = len(c_tasks)
     progress_cnt = len(i_tasks)
-    impossible_cnt = len(n_tasks)
-    other_cnt = progress_cnt + impossible_cnt
 
     context = RequestContext(request, {
                 'tasks':tasks,\
                 'p_tasks': p_tasks,\
-                'itask_list':itask_list, 'ntask_list':ntask_list, \
-                'ctask_list':ctask_list, 'ptask_list': ptask_list, \
-                'task_cnt': task_cnt, 'pending_cnt': pending_cnt,\
-                'complete_cnt': complete_cnt, 'progress_cnt':progress_cnt,\
-                'impossible_cnt':impossible_cnt, 'other_cnt': other_cnt,\
+                'ptask_list': ptask_list, \
                 'active': 'tasklist',})
     return HttpResponse(template.render(context))
 
@@ -551,27 +513,15 @@ def other_list(request):
     List of tasks marked as incomplete.
     """
     template = loader.get_template('other_list.html')
-    i_tasks = n_tasks = []
     tasks = TaskQ.objects.all()
-
     tasks = tasks.order_by('priority')
-    i_tasks = tasks.filter(status='I')
-    n_tasks = tasks.filter(status='N')
-
-    progress_cnt = len(i_tasks)
-    impossible_cnt = len(n_tasks)
-    other_cnt = progress_cnt + impossible_cnt
-
     #
     # Complete tasks
     #
-    other_tasks =  tasks.filter(status__in=['I', 'X'])
-    task_cnt = len(tasks)
-
+    other_tasks =  tasks.filter(status__in=['X'])
+    other_tasks = other_tasks.order_by('modified')
     context = RequestContext(request, {
                 'xtasks':other_tasks, \
-                'task_cnt': task_cnt, 'progress_cnt':progress_cnt,\
-                'other_cnt': other_cnt, 'impossible_cnt': impossible_cnt, \
                 'active': 'otherlist',})
     return HttpResponse(template.render(context))
 

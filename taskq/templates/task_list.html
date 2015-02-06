@@ -22,7 +22,9 @@
             </thead>
             <tbody>
                 {%for  task in p_tasks%}
-                    <tr {%if task.repeatable %} style="border-left: solid blue 2px;"{%endif%}>
+                    <tr {%if task.repeatable %} style="border-left: solid blue 2px;" 
+                        {%elif task.status == 'I'%} style="border-left: solid green 2px;"
+                        {%endif%}>
                         <td width="12%">
                             <small>
                                 {% if task.repeatable %}
@@ -47,8 +49,9 @@
                             {#{task.desc|truncatechars:60}#}
                             {{task.desc}}
                         </td>
-                        <td width="8%">
-                            {% show_pending_priority task %}
+                        <td width="8%" {%if task.status == 'I' %}
+                                style='background:#BEF781;' title="In-Progress"{%endif%}>
+                            {% show_pending_priority task %} 
                         </td>
                         {%if request.user.is_superuser or request.user.is_staff%}
                             <td>
