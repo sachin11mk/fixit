@@ -1,5 +1,5 @@
 # system
-from django.shortcuts import render
+from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from django.contrib import messages
@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from itertools import chain
 from datetime import datetime, timedelta
+from django.views.generic import ListView
 import math
 
 # custom
@@ -22,6 +23,8 @@ from django.db.models import Q
 def send_postfix_mail(body, sub, to):
     try:
         cmd = "echo '%s' | mail -s '%s' '%s'"%(body, sub, to)
+        print "TTTT"
+        print cmd
         sp = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
         sp.wait()
         if sp.returncode == 0:
@@ -30,6 +33,7 @@ def send_postfix_mail(body, sub, to):
             print sp.stderr.readlines()
             print "Error : Failed to send postfix mail"
     except Exception, msg:
+        print "++++++++++++"
         print msg
         pass
 
@@ -50,6 +54,7 @@ def add_task(request):
         form = TaskForm(request.POST)
         if request.user.is_superuser or request.user.is_staff:
             form = TaskAdminForm(request.POST)
+
         if form.is_valid():
             data = {}
             data['floor'] = form.cleaned_data['floor']
@@ -79,16 +84,21 @@ def add_task(request):
                 error_msg = "Failed to save task to database."
                 messages.add_message(request, messages.ERROR, error_msg)
 
-            superusers = User.objects.filter(Q(is_superuser=1) \
-                    | Q(is_staff=1))
+            superusers = User.objects.filter(Q(is_superuser=0) \
+                    & Q(is_staff=1))
 
             email_list = superusers.values_list('email')
+            print "==========="
+            email_list = list(set(email_list))
+            print email_list
+            print "==========="
+
             for to in email_list:
                 sub = "Fixit: New Task @ Floor-%s"%task.floor
                 #
                 # comment out test automated mails.
                 #
-                ### send_postfix_mail(task.desc, sub, to[0])
+                send_postfix_mail(task.desc, sub, to[0])
 
             return HttpResponseRedirect(reverse('task_list'))
         else:
@@ -104,6 +114,9 @@ def add_task(request):
 
 
 def task_details(request, task_id):
+    """
+    show task details page.
+    """
     template = loader.get_template('task.html')
     task = TaskQ.objects.get(id=task_id)
     heading = ""
@@ -121,7 +134,7 @@ def task_details(request, task_id):
 
     # Which Room?
     if task.room == "0":
-        heading += "Conf. Room "
+        heading += "Conference Room "
     elif task.room == "1":
         heading += "Room 1 "
     elif task.room == "2":
@@ -134,6 +147,14 @@ def task_details(request, task_id):
         heading += "Accounts "
     elif task.room == "6":
         heading += "Server "
+    elif task.room == "7":
+        heading += "Lunch Area "
+    elif task.room == "8":
+        heading += "Common Passage "
+    elif task.room == "9":
+        heading += "Stairwell "
+    elif task.room == "10":
+        heading += "Lift "
 
     if task.status == "P":
         status = "Pending"
@@ -159,6 +180,9 @@ def task_details(request, task_id):
 
 
 def edit_task(request, task_id):
+    """
+    Edit task.
+    """
     template = loader.get_template('edit_task.html')
     task = TaskQ.objects.get(id=task_id)
 
@@ -188,8 +212,8 @@ def edit_task(request, task_id):
             else:
                 repeatable = False
                 data['repeat_time'] = None
-            data['repeatable'] = repeatable
 
+            data['repeatable'] = repeatable
 
             task = update_task(task, form_data=data)
             success_msg = "Task updated successfully."
@@ -207,6 +231,9 @@ def edit_task(request, task_id):
 
 
 def mark_task_complete(request, task_id):
+    """
+    Logic to mark the task as complete.
+    """
     task = TaskQ.objects.get(id=task_id)
     ctime = datetime.now()
     task.completed = ctime
@@ -241,6 +268,9 @@ def mark_task_complete(request, task_id):
 
 
 def mark_task_pending(request, task_id):
+    """
+    Logic to mark task as incomplete.
+    """
     task = TaskQ.objects.get(id=task_id)
     task.status = 'P'
     task.completed = None
@@ -270,6 +300,10 @@ def mark_task_pending(request, task_id):
 
 
 def delete_task(request, task_id):
+    """
+    Delete the task.
+    Only superuser can delete the task.
+    """
     if request.user.is_superuser:
         template = loader.get_template('task_list.html')
         context = RequestContext(request, {})
@@ -286,6 +320,10 @@ def delete_task(request, task_id):
 
 
 def repeat_task_log(request):
+    """
+    Show repeat task logs in tabular and modular format.
+    Only superuser can access this page.
+    """
     if request.user.is_superuser:
         template = loader.get_template('repeat_task_log.html')
         context = RequestContext(request, {})
@@ -315,6 +353,10 @@ def repeat_task_log(request):
 
 
 def task_list(request):
+    """
+    List of all pending tasks.
+    This is main landing page. Home page.
+    """
     template = loader.get_template('task_list.html')
     p_tasks =  i_tasks = n_tasks = c_tasks = []
     tasks = TaskQ.objects.all()
@@ -337,7 +379,7 @@ def task_list(request):
 
 
     # Paginate pages with 10 records / page.
-    paginator = Paginator(p_tasks, 10)
+    paginator = Paginator(p_tasks, 100)
     page = request.GET.get('page', '1')
     try:
         ptask_list = paginator.page(page)
@@ -388,7 +430,7 @@ def task_list(request):
     #
     # Not possible tasks
     #
-    n_tasks = tasks.filter(status='N')
+    n_tasks = tasks.filter(status='X')
     # Paginate pages with 10 records / page.
     paginator = Paginator(n_tasks, 5)
     page = request.GET.get('page', '1')
@@ -411,6 +453,7 @@ def task_list(request):
 
     context = RequestContext(request, {
                 'tasks':tasks,\
+                'p_tasks': p_tasks,\
                 'itask_list':itask_list, 'ntask_list':ntask_list, \
                 'ctask_list':ctask_list, 'ptask_list': ptask_list, \
                 'task_cnt': task_cnt, 'pending_cnt': pending_cnt,\
@@ -423,6 +466,9 @@ def task_list(request):
 
 
 def completed_list(request):
+    """
+    List of all completed tasks.
+    """
     template = loader.get_template('completed_list.html')
     p_tasks =  i_tasks = n_tasks = c_tasks = []
     tasks = TaskQ.objects.all()
@@ -443,9 +489,9 @@ def completed_list(request):
     #
     # Complete tasks
     #
-    c_tasks = tasks.filter(status='C')
+    c_tasks = tasks.filter(status='C').order_by('-completed')
     # Paginate pages with 10 records / page.
-    paginator = Paginator(c_tasks, 5)
+    paginator = Paginator(c_tasks, 50)
     page = request.GET.get('page', '1')
     try:
         ctask_list = paginator.page(page)
@@ -486,6 +532,7 @@ def completed_list(request):
 
     context = RequestContext(request, {
                 'tasks':tasks,\
+                'c_tasks': c_tasks,
                 'ctask_list':ctask_list, \
                 'task_cnt': task_cnt, 'pending_cnt': pending_cnt,\
                 'complete_cnt': complete_cnt, 'progress_cnt':progress_cnt,\
@@ -500,6 +547,9 @@ def completed_list(request):
 
 
 def other_list(request):
+    """
+    List of tasks marked as incomplete.
+    """
     template = loader.get_template('other_list.html')
     i_tasks = n_tasks = []
     tasks = TaskQ.objects.all()
@@ -525,6 +575,15 @@ def other_list(request):
                 'active': 'otherlist',})
     return HttpResponse(template.render(context))
 
+
+class OtherList(ListView):
+    model = TaskQ
+    template_name = "other_list.html"
+
+    def get_queryset(self):
+        objects = TaskQ.objects.filter()
+        print objects
+        return objects
 
 
 

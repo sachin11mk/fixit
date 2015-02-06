@@ -2,6 +2,8 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.conf.urls import handler400, handler403
 from django.conf.urls import handler404, handler500
+from django.views.generic import TemplateView
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = patterns('',
     # Examples:
@@ -15,8 +17,11 @@ urlpatterns = patterns('',
 
     url(r'^task/', include('taskq.urls')),
     url(r'^admin/', include(admin.site.urls)),
+    url(r'', include('social_auth.urls')),
+    url(r'', include('django.contrib.auth.urls', namespace='auth')),
 )
 
+urlpatterns += staticfiles_urlpatterns()
 
 handler400 = "fixit.views.handle400"
 handler403 = "fixit.views.handle403"
