@@ -98,7 +98,7 @@ def add_task(request):
                 #
                 # comment out test automated mails.
                 #
-                send_postfix_mail(task.desc, sub, to[0])
+                #####send_postfix_mail(task.desc, sub, to[0])
 
             return HttpResponseRedirect(reverse('task_list'))
         else:
