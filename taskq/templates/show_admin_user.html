@@ -20,10 +20,12 @@
         {%endif%}
     </div>
 {% else %}
+    <h5>
     <a href='{% url "socialauth_begin" "google-oauth2" %}'>
         <span class="pull-right" 
-            style="color:#FFF;test-decoration:none;"><i>G+ Login</i> </span>
+            style="color:#FFF;test-decoration:none;margin-top:10px;margin-bottom:5px;"><i>G+ Login</i> </span>
     </a>
+    </h5>
 {% endif %}
 
 
