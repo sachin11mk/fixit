@@ -219,16 +219,48 @@ def edit_task(request, task_id):
             task = update_task(task, form_data=data)
             new_status = task.status
 
+            status_change = ""
             if orig_status == "C" and new_status=="P":
                 task.status = 'P'
                 task.completed = None
                 task.save()
+                status_change = "CtoP"
 
             if orig_status == "P" and new_status=="C":
                 ctime = datetime.now()
                 task.completed = ctime
                 task.status = 'C'
                 task.save()
+                status_change = "PtoC"
+
+            ####################
+            if task.repeatable:
+                try:
+                    RTL = RepeatTaskLog.objects.get(task_id=task.id,\
+                        task_repeat_time=task.repeat_time)
+                    if RTL:
+                        if status_change == "CtoP":
+                            RTL.status = 0
+                            RTL.comment = "Not Done"
+                        if status_change == "PtoC":
+                            RTL.status = 1
+                            RTL.comment = "Complete"
+                        RTL.save()
+                except Exception, msg:
+                    if status_change == "CtoP":
+                        comment = "Not Done"
+                        status = 0
+                    elif status_change == "PtoC":
+                        comment = "Complete"
+                        status = 1
+                    else:
+                        comment = ""
+                        status = 0
+                    RTL = RepeatTaskLog.objects.create(task_id=task.id,\
+                            task_repeat_time=task.repeat_time,
+                            status=status, comment=comment)
+                    RTL.save()
+            ####################
 
             success_msg = "Task updated successfully."
             messages.add_message(request, messages.SUCCESS, success_msg)
