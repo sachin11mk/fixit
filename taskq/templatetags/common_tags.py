@@ -8,6 +8,7 @@ from django.conf import settings
 from datetime import datetime, timedelta
 from  taskq.models import TaskQ
 from django.utils.timesince import timesince
+from django.contrib.auth.models import User
 
 try:
     from cStringIO import StringIO
@@ -251,4 +252,27 @@ def show_pending_priority(task):
         priority="<span class='bg-low'>Suggestion</span>"
     return priority
 
+
+@register.simple_tag
+def get_task_cuser(task):
+    user = ''
+    try:
+        user = User.objects.get(id=task.cuser)
+        if user:
+            return user.username
+    except Exception, msg:
+        print msg
+    return "NA"
+
+
+@register.simple_tag
+def get_task_euser(task):
+    user = ''
+    try:
+        user = User.objects.get(id=task.euser)
+        if user:
+            return user.username
+    except Exception, msg:
+        print msg
+    return "NA"
 

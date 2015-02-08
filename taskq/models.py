@@ -57,6 +57,8 @@ class TaskQ(models.Model):
     completed = models.DateTimeField(null=True, blank=True)
     repeatable = models.BooleanField(default=False)
     repeat_time = models.DateTimeField(null=True, blank=True)
+    cuser = models.IntegerField(null=True, blank=True)
+    euser = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return "Task-%s__%s"%(str(self.id), self.desc[:12])
