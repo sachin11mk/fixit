@@ -11,12 +11,12 @@
         <table class="table table-bordered" id="task-list-table">
             <thead>
                 <th width="5%"><b>#</b></th>
-                <th width="11%"><b>Time</b></th>
-                <th width="17%"><b>Location</b></th>
+                <th width="10%"><b>Time</b></th>
+                <th width="15%"><b>Location</b></th>
                 <th width="42%"><b>Details</b></th>
                 <th width="8%"><b>Priority</b></th>
+                <th width=""><b>admin</b></th>
                 {%if request.user.is_superuser or request.user.is_staff%}
-                    <th width=""><b>admin</b></th>
                 {%endif%}
             </thead>
         </table>
@@ -34,7 +34,7 @@
                                     {{forloop.counter}}.
                                 </small>
                             </td>
-                            <td width="11%">
+                            <td width="10%">
                                 <small>
                                     {% if task.repeatable %}
                                         &nbsp;
@@ -48,7 +48,7 @@
                                     {%endif%}
                                 </small>
                             </td>
-                            <td width="17%">
+                            <td width="15%">
                                 <small>
                                     {% show_location task%}
                                 </small>
@@ -65,25 +65,34 @@
                                     {% show_pending_priority task %} 
                                 </small>
                             </td>
-                            {%if request.user.is_superuser or request.user.is_staff%}
-                                <td width="">
-                                    <!-- Edit link -->
-                                    <a href="{%url 'edit_task' task.id%}">
-                                        <span title="Edit" class="glyphicon glyphicon-pencil"></span></a>
-                                    &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
+                            <td width="">
+                                <!-- Edit link -->
+                                <a href="{%url 'edit_task' task.id%}">
+                                    <span title="Edit" class="glyphicon glyphicon-pencil"></span></a>
 
+                                {%if request.user.is_superuser or request.user.is_staff%}
+                                    &nbsp; | &nbsp; 
                                     <!-- Done link -->
                                     <a title="Mark as done." href="{%url 'mark_task_complete' task.id%}">
                                         <span title="Done" class="glyphicon glyphicon-ok"></span></a>
                                     
                                     <!-- Delete link -->
                                     {%if request.user.is_superuser%}
-                                        &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
+                                        &nbsp; | &nbsp;
                                         <a id="id-del-task" href="{%url 'delete_task' task.id%}">
                                         <span title="Delete" class="glyphicon glyphicon-trash"></span></a>
                                     {%endif%}
-                                </td>
-                            {%endif%}
+                                {%endif%}
+                                {%if task.cuser%}
+                                    &nbsp; | &nbsp;
+                                    <span title="Reporter: {%get_task_cuser task%}" class="glyphicon glyphicon-user"></span>
+                                {%endif%}
+                                {%if task.euser%}
+                                    &nbsp; | &nbsp;
+                                    <span title="Last Edited: {%get_task_euser task%}" class="glyphicon glyphicon-eye-open"></span>
+                                {%endif%}
+
+                            </td>
                         </tr>         
                     {%endfor%}
 

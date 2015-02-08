@@ -19,16 +19,12 @@
 
             <br/><br/>
             <div class="panel panel-default">
-                <div class="col-xs-4" style="background:#E5E4E2;">Target Time</div>
-                <div class="col-xs-2" style="background:#E5E4E2;">Status</div>
+                <div class="col-xs-6" style="background:#E5E4E2;">Target Time</div>
                 <div class="col-xs-6" style="background:#E5E4E2;">Comment</div>
                 <br/>
                 {% for rtl in RT.rtl_list %}
-                    <span class="col-xs-4">
+                    <span class="col-xs-6">
                         {{rtl.task_repeat_time}}
-                    </span>
-                    <span class="col-xs-2">
-                        {{rtl.status}}
                     </span>
                     <span class="col-xs-6">
                         {{rtl.comment}}

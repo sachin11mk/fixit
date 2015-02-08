@@ -52,7 +52,7 @@ class TaskForm(forms.ModelForm):
 
     class Meta:
         model = TaskQ
-        exclude = ('created', 'modified', 'status',)
+        exclude = ('created', 'modified', 'status', 'cuser', 'euser')
 
     def clean_floor(self):
         if self.cleaned_data['floor']:
@@ -138,7 +138,7 @@ class TaskAdminForm(TaskForm):
                 'placeholder': 'Select Status'}, choices=STATUS_CHOICES ))
     class Meta:
         model = TaskQ
-        exclude = ('created', 'modified',)
+        exclude = ('created', 'modified', 'cuser', 'euser')
 
     def clean_floor(self):
         if self.cleaned_data['floor']:

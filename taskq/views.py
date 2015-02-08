@@ -71,6 +71,10 @@ def add_task(request):
 
             task = save_task(form_data=data)
 
+            if request.user.is_authenticated():
+                task.cuser = request.user.id
+                task.save()
+
             if repeatable:
                 RTL = RepeatTaskLog.objects.create(task_id=task.id,\
                         task_repeat_time=task.repeat_time,
@@ -218,6 +222,10 @@ def edit_task(request, task_id):
             orig_status = task.status
             task = update_task(task, form_data=data)
             new_status = task.status
+
+            if request.user.is_authenticated():
+                task.euser = request.user.id
+                task.save()
 
             status_change = ""
             if orig_status == "C" and new_status=="P":
