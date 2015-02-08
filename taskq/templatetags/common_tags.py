@@ -45,6 +45,7 @@ def time_required(task_id):
     else:
         open_time = task.created
     close_time = task.completed
+
     try:
         delta = close_time - open_time
     except:

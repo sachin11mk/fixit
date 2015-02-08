@@ -16,99 +16,89 @@
             </h4>
 
         {%if c_tasks%}
-            <table class="table table-bordered">
+            <br/>
+            <table class="table table-bordered" id="task-list-table">
                 <thead>
-                    {%comment%}
-                    <th>#</th>
-                    {%endcomment%}
-                    <th width="12%"><h4><b>Time to fix</b></h4></th>
-                    <th width="18%"><h4><b>Location</b></h4></th>
-                    <th width="42%"><h4><b>Details</b></h4></th>
-                    <th width="8%"><h4><b>Priority</b></h4></th>
+                    <th width="5%"><b>#</b></th>
+                    <th width="11%"><b>Time to fix</b></th>
+                    <th width="17%"><b>Location</b></th>
+                    <th width="42%"><b>Details</b></th>
+                    <th width="8%"><b>Priority</b></th>
                     {%if request.user.is_superuser or request.user.is_staff%}
-                        <th></th>
+                        <th width=""><b>admin</b></th>
                     {%endif%}
                 </thead>
-                <tbody>
-                    {%for  task in c_tasks%}
-                        <!-- <tr>  -->
-                        <tr {%if task.repeatable %} style="border-left: solid blue 2px;"{%endif%}>
-                    {%comment%}
-                            <td>{{forloop.counter|add:ctask_list.next_page_number}}.</td>
-                    {%endcomment%}
-                            <td width="12%">
-                                {% if task.repeatable %}
-                                    &nbsp;
-                                    <span class="glyphicon glyphicon-repeat"
-                                        style="color:blue; font-weight:bold;"
-                                        title="">
-                                    </span> &nbsp;
-                                {%endif%}
-                                {%time_required task.id %}
-
-                            </td>
-                            <td width="18%">
-                                {% show_location task%}
-                            </td>
-                            <td width="42%" title="{{task.desc}}">
-                                {#{task.desc|truncatechars:60}#}
-                                {{task.desc}}
-                            </td>
-                            <td width="8%" style='color:green;'>
-                                {% show_priority task%}
-                            </td>
-                            {%if request.user.is_superuser or request.user.is_staff%}
-                                <td>
-                                    <!-- Edit link -->
-                                    <a href="{%url 'edit_task' task.id%}">
-                                        <span title="Edit" class="glyphicon glyphicon-pencil"></span></a>
-                                    &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
-
-                                    <!-- Pending link -->
-                                    <a title="Mark as pending." href="{%url 'mark_task_pending' task.id%}">
-                                        <span title="Pending" class="glyphicon glyphicon-remove"></span></a>
-
-                                    <!-- Delete link -->
-                                    {%if request.user.is_superuser%}
-                                        &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
-                                        <a id="id-del-task" href="{%url 'delete_task' task.id%}">
-                                        <span title="Delete" class="glyphicon glyphicon-trash"></span></a>
-                                    {%endif%}
-                                </td>
-                            {%endif%}
-                        </tr>         
-                    {%endfor%}
-
-                </tbody>
             </table>
 
-{%comment%}
-            <div class="pagination">
-                <span class="step-links">
-                    {% if ctask_list.has_previous %}
-                        <a href="?page={{ ctask_list.previous_page_number }}">previous</a>
-                    {% endif %}
 
-                    <span class="current">
-                        Page {{ ctask_list.number }} of {{ ctask_list.paginator.num_pages }}.
-                    </span>
+            <div id="task-list-scroll">
+                <table class="table table-bordered" id="task-list-table-1">
+                    <tbody id="task-list-tbody">
 
-                    {% if ctask_list.has_next %}
-                        <a href="?page={{ ctask_list.next_page_number }}">next</a>
-                    {% endif %}
-                </span>
+                        {%for  task in c_tasks%}
+                            <tr {%if task.repeatable %} style="border-left: solid blue 2px;"{%endif%}>
+                                <td width="5%">
+                                    <small>
+                                        {{forloop.counter}}.
+                                    </small>
+                                </td>
+                                <td width="11%">
+                                    <small>
+                                        {% if task.repeatable %}
+                                            &nbsp;
+                                            <span class="glyphicon glyphicon-repeat"
+                                                style="color:blue; font-weight:bold;"
+                                                title="">
+                                            </span> &nbsp;
+                                        {%endif%}
+                                        {%time_required task.id %}
+                                    </small>
+
+                                </td>
+                                <td width="17%">
+                                    <small>
+                                        {% show_location task%}
+                                    </small>
+                                </td>
+                                <td width="42%" title="{{task.desc}}">
+                                    {#{task.desc|truncatechars:60}#}
+                                    <small>
+                                        {{task.desc}}
+                                    </small>
+                                </td>
+                                <td width="8%" style='color:green;'>
+                                    <small>
+                                        {% show_priority task%}
+                                    </small>
+                                </td>
+                                {%if request.user.is_superuser or request.user.is_staff%}
+                                    <td width="">
+                                        <!-- Edit link -->
+                                        <a href="{%url 'edit_task' task.id%}">
+                                            <span title="Edit" class="glyphicon glyphicon-pencil"></span></a>
+                                        &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
+
+                                        <!-- Pending link -->
+                                        <a title="Mark as pending." href="{%url 'mark_task_pending' task.id%}">
+                                            <span title="Pending" class="glyphicon glyphicon-remove"></span></a>
+
+                                        <!-- Delete link -->
+                                        {%if request.user.is_superuser%}
+                                            &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 
+                                            <a id="id-del-task" href="{%url 'delete_task' task.id%}">
+                                            <span title="Delete" class="glyphicon glyphicon-trash"></span></a>
+                                        {%endif%}
+                                    </td>
+                                {%endif%}
+                            </tr>         
+                        {%endfor%}
+                    </tbody>
+                </table>
+                <br/><br/>
             </div>
-{%endcomment%}
-
             <br/>
-            <div class="pull-right"> 
-                <br/>
-                <a href="#top-btn">
-                    <span class="glyphicon glyphicon-arrow-up"></span>
-                </a>
-            </div>
-            <br/>
-        {%else%}
+        </div>
+    {%else%}
             No complete tasks found.
         {%endif%}
     </div>

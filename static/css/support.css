@@ -69,3 +69,41 @@ a#brand {
 .bg-low {
     color: #0080FF;
 }
+
+
+
+
+/* task listing page */
+
+div#ptask-div,
+div#ctask-div {
+    height: 500px;
+}
+
+div#task-list-scroll {
+    width: 94%;
+    position: absolute; 
+    height: 350px; 
+    overflow-y:auto; 
+}
+
+
+table#task-list-table {
+    height: 350px;
+    margin-bottom: 5px;
+}
+
+table tbody#task-list-tbody {
+    height: 350px;
+}
+
+/*
+    position: absolute;*
+    background-color:#610B0B; 
+    color:#FFF; 
+    z-index:9999;
+    height: 500px;
+    overflow-y: scroll;
+    display:block;
+    width: 100%;
+*/

@@ -215,7 +215,21 @@ def edit_task(request, task_id):
 
             data['repeatable'] = repeatable
 
+            orig_status = task.status
             task = update_task(task, form_data=data)
+            new_status = task.status
+
+            if orig_status == "C" and new_status=="P":
+                task.status = 'P'
+                task.completed = None
+                task.save()
+
+            if orig_status == "P" and new_status=="C":
+                ctime = datetime.now()
+                task.completed = ctime
+                task.status = 'C'
+                task.save()
+
             success_msg = "Task updated successfully."
             messages.add_message(request, messages.SUCCESS, success_msg)
             return HttpResponseRedirect(reverse('task_list'))
@@ -357,6 +371,23 @@ def task_list(request):
     List of all pending tasks.
     This is main landing page. Home page.
     """
+
+    '''
+    import random
+    i = 0
+    while i < 50:
+        j = 0
+        sss = ''
+        while j < 6:
+            sss += chr(random.randint(97, 122))
+            j += 1
+        ttask = TaskQ.objects.create(floor=3, room=2, desc=sss, \
+                repeatable=False, repeat_time=None, \
+                priority='H')
+        ttask.save()
+        i += 1
+    '''
+
     template = loader.get_template('task_list.html')
     p_tasks =  i_tasks = n_tasks = c_tasks = []
     tasks = TaskQ.objects.all()
