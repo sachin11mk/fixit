@@ -187,6 +187,12 @@ def edit_task(request, task_id):
     """
     Edit task.
     """
+    if not request.user.is_authenticated:
+        error_msg = "Permission denied."
+        messages.add_message(request, messages.ERROR, error_msg)
+        return HttpResponseRedirect(reverse('task_list'))
+
+
     template = loader.get_template('edit_task.html')
     task = TaskQ.objects.get(id=task_id)
 
@@ -195,20 +201,29 @@ def edit_task(request, task_id):
         'room': task.room,
         'desc': task.desc,
         'priority': task.priority,
-        'status': task.status,
         'repeatable': task.repeatable,
         'repeat_time': task.repeat_time,
     }
-    form = TaskAdminForm(initial=task_dict)
+
+    if request.user.is_staff or request.user.is_superuser:
+        task_dict.update({'status': task.status})
+        form = TaskAdminForm(initial=task_dict)
+    if not request.user.is_staff and not request.user.is_superuser and \
+            request.user.is_authenticated:
+        form = TaskForm(initial=task_dict)
     if request.method == "POST":
-        form = TaskAdminForm(request.POST)
+        if request.user.is_staff or request.user.is_superuser:
+            form = TaskAdminForm(request.POST)
+        else:
+            form = TaskForm(request.POST)
         if form.is_valid():
             data = {}
             data['floor'] = form.cleaned_data['floor']
             data['room'] = form.cleaned_data['room']
             data['desc'] = form.cleaned_data['desc']
             data['priority'] = form.cleaned_data['priority']
-            data['status'] = form.cleaned_data['status']
+            if request.user.is_staff:
+                data['status'] = form.cleaned_data['status']
 
             if request.POST.has_key('repeatable'):
                 repeatable = True
@@ -219,56 +234,59 @@ def edit_task(request, task_id):
 
             data['repeatable'] = repeatable
 
-            orig_status = task.status
+            if request.user.is_staff:
+                orig_status = task.status
             task = update_task(task, form_data=data)
-            new_status = task.status
+            if request.user.is_staff:
+                new_status = task.status
 
             if request.user.is_authenticated():
                 task.euser = request.user.id
                 task.save()
 
-            status_change = ""
-            if orig_status == "C" and new_status=="P":
-                task.status = 'P'
-                task.completed = None
-                task.save()
-                status_change = "CtoP"
+            if request.user.is_staff:
+                status_change = ""
+                if orig_status == "C" and new_status=="P":
+                    task.status = 'P'
+                    task.completed = None
+                    task.save()
+                    status_change = "CtoP"
 
-            if orig_status == "P" and new_status=="C":
-                ctime = datetime.now()
-                task.completed = ctime
-                task.status = 'C'
-                task.save()
-                status_change = "PtoC"
+                if orig_status == "P" and new_status=="C":
+                    ctime = datetime.now()
+                    task.completed = ctime
+                    task.status = 'C'
+                    task.save()
+                    status_change = "PtoC"
 
-            ####################
-            if task.repeatable:
-                try:
-                    RTL = RepeatTaskLog.objects.get(task_id=task.id,\
-                        task_repeat_time=task.repeat_time)
-                    if RTL:
+                ####################
+                if task.repeatable:
+                    try:
+                        RTL = RepeatTaskLog.objects.get(task_id=task.id,\
+                            task_repeat_time=task.repeat_time)
+                        if RTL:
+                            if status_change == "CtoP":
+                                RTL.status = 0
+                                RTL.comment = "Not Done"
+                            if status_change == "PtoC":
+                                RTL.status = 1
+                                RTL.comment = "Complete"
+                            RTL.save()
+                    except Exception, msg:
                         if status_change == "CtoP":
-                            RTL.status = 0
-                            RTL.comment = "Not Done"
-                        if status_change == "PtoC":
-                            RTL.status = 1
-                            RTL.comment = "Complete"
+                            comment = "Not Done"
+                            status = 0
+                        elif status_change == "PtoC":
+                            comment = "Complete"
+                            status = 1
+                        else:
+                            comment = ""
+                            status = 0
+                        RTL = RepeatTaskLog.objects.create(task_id=task.id,\
+                                task_repeat_time=task.repeat_time,
+                                status=status, comment=comment)
                         RTL.save()
-                except Exception, msg:
-                    if status_change == "CtoP":
-                        comment = "Not Done"
-                        status = 0
-                    elif status_change == "PtoC":
-                        comment = "Complete"
-                        status = 1
-                    else:
-                        comment = ""
-                        status = 0
-                    RTL = RepeatTaskLog.objects.create(task_id=task.id,\
-                            task_repeat_time=task.repeat_time,
-                            status=status, comment=comment)
-                    RTL.save()
-            ####################
+                ####################
 
             success_msg = "Task updated successfully."
             messages.add_message(request, messages.SUCCESS, success_msg)
