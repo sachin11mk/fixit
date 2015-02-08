@@ -73,7 +73,12 @@
                                 </td>
                                 <td width="">
                                     <!-- Edit link -->
-                                    <a href="{%url 'edit_task' task.id%}">
+
+                                    <a href="{%if request.user.is_authenticated%} 
+                                            {%url 'edit_task' task.id%}
+                                        {%else%}
+                                            {% url 'socialauth_begin' 'google-oauth2' %} 
+                                        {%endif%}">
                                     <span title="Edit" class="glyphicon glyphicon-pencil"></span></a>
                                     {%if request.user.is_superuser or request.user.is_staff%}
                                         &nbsp; | &nbsp;

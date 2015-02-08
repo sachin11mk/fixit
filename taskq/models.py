@@ -93,7 +93,9 @@ def update_task(instance=None, **kwargs):
         room = kwargs['form_data']['room']
         desc = kwargs['form_data']['desc']
         priority = kwargs['form_data']['priority']
-        status = kwargs['form_data']['status']
+        if kwargs['form_data'].has_key('status'):
+            status = kwargs['form_data']['status']
+            task.status = status
         repeatable = kwargs['form_data']['repeatable']
         repeat_time = kwargs['form_data']['repeat_time']
         task.floor = floor
@@ -102,7 +104,6 @@ def update_task(instance=None, **kwargs):
         task.repeatable = repeatable
         task.repeat_time = repeat_time
         task.priority = priority
-        task.status = status
         task.save()
 
         try:

@@ -38,7 +38,7 @@
                 </div>
             </div>
 
-            {% if request.user.is_superuser %}
+            {% if request.user.is_staff %}
                 <div class="form-group">
                     <label for="status" class="col-sm-2 control-label">Status</label>
                     <div class="col-sm-10">
