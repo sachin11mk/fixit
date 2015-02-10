@@ -552,6 +552,7 @@ def completed_list(request):
 
         Fpg=request.session.get('Fpg')
         Bpg=request.session.get('Bpg')
+<<<<<<< HEAD
         p = Paginator(c_tasks, 5)
         if request.GET['direction']=='forword':
             if p.page(Fpg).has_next():
@@ -575,6 +576,41 @@ def completed_list(request):
 
         else:
             pass
+=======
+        try:
+            p = Paginator(c_tasks, 5)
+            if request.GET['direction']=='forword':
+                if p.page(Fpg).has_next():
+                    print "forword"
+                    Fpg+=1
+                    c_tasks = p.page(Fpg)
+                    Bpg+=1
+                    request.session['Fpg'] = Fpg
+                    request.session['Bpg'] = Bpg
+                else:
+                    return HttpResponseNotFound("forword")
+            elif request.GET['direction']=='backword':
+                if p.page(Bpg).has_previous():
+                    Bpg-=1
+                    c_tasks = p.page(Bpg)
+                    Fpg-=1
+                    request.session['Fpg'] = Fpg
+                    request.session['Bpg'] = Bpg
+                else:
+                    return HttpResponseNotFound("backword")
+
+            else:
+                pass
+        except InvalidPage, ip:
+            print  ip
+            return HttpResponseNotFound()
+        except EmptyPage, ep:
+            print "AAA", ep
+            return HttpResponseNotFound()
+        except Exception, e:
+            print e
+            return HttpResponseNotFound()
+>>>>>>> 2623fec97906acfed5c31c307dd01b125e85bc70
         print Bpg,Fpg
         return render(request, 'completed_list_table_row.html',{"c_tasks": c_tasks})
 

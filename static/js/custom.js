@@ -75,7 +75,9 @@ function ajax_load(act,scrolltop){
         error:function(e,xhr,foo){
             if(e.responseText=="backword"){backword=0}
             else if(e.responseText=="forword"){forword=0}
-            else{alert(e.responseText)} 
+            else{
+                //alert(e.responseText)
+            } 
             $('#spinner').hide()
             processing=0
         },
