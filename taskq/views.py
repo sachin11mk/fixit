@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_protect
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger, InvalidPage 
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger, InvalidPage
 from itertools import chain
 from datetime import datetime, timedelta
 from django.views.generic import ListView
@@ -458,20 +458,20 @@ def task_list(request):
     p_tasks = list(chain(progress, pending))
 
     if request.is_ajax():
-        
+
         Fpg=request.session.get('Fpg')
         Bpg=request.session.get('Bpg')
         p = Paginator(p_tasks, 5)
         if request.GET['direction']=='forword':
             if p.page(Fpg).has_next():
-                print "forword" 
+                print "forword"
                 Fpg+=1
                 p_tasks = p.page(Fpg)
                 Bpg+=1
                 request.session['Fpg'] = Fpg
                 request.session['Bpg'] = Bpg
             else:
-                return HttpResponseNotFound("forword")   
+                return HttpResponseNotFound("forword")
         elif request.GET['direction']=='backword':
             if p.page(Bpg).has_previous():
                 Bpg-=1
@@ -481,7 +481,7 @@ def task_list(request):
                 request.session['Bpg'] = Bpg
             else:
                 return HttpResponseNotFound("backword")
-             
+
         else:
             pass
         print Bpg,Fpg
@@ -549,20 +549,20 @@ def completed_list(request):
             task_done_rate = "NA"
 
     if request.is_ajax():
-        
+
         Fpg=request.session.get('Fpg')
         Bpg=request.session.get('Bpg')
         p = Paginator(c_tasks, 5)
         if request.GET['direction']=='forword':
             if p.page(Fpg).has_next():
-                print "forword" 
+                print "forword"
                 Fpg+=1
                 c_tasks = p.page(Fpg)
                 Bpg+=1
                 request.session['Fpg'] = Fpg
                 request.session['Bpg'] = Bpg
             else:
-                return HttpResponseNotFound("forword")   
+                return HttpResponseNotFound("forword")
         elif request.GET['direction']=='backword':
             if p.page(Bpg).has_previous():
                 Bpg-=1
@@ -572,7 +572,7 @@ def completed_list(request):
                 request.session['Bpg'] = Bpg
             else:
                 return HttpResponseNotFound("backword")
-             
+
         else:
             pass
         print Bpg,Fpg
@@ -616,7 +616,7 @@ def other_list(request):
             if p.page(Fpg).has_next():
                 Fpg+=1
                 other_tasks=p.page(Fpg)
-                print len(other_tasks) 
+                print len(other_tasks)
                 Bpg+=1
                 request.session['Fpg']=Fpg
                 request.session['Bpg']=Bpg
