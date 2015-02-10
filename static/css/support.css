@@ -80,6 +80,11 @@ div#ctask-div {
     height: 500px;
 }
 
+div#divtablecontent{
+    height: 400px; 
+    overflow-y:auto; 
+}
+
 div#task-list-scroll {
     width: 94%;
     position: absolute; 

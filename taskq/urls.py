@@ -1,6 +1,5 @@
 from django.conf.urls import patterns, url
 from taskq import views
-from taskq.views import OtherList
 
 urlpatterns = patterns( '',
     url(r'^add/$', views.add_task, name='add_task'),

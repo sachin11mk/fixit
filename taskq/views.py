@@ -1,12 +1,13 @@
 # system
-from django.shortcuts import render, render_to_response
+from django.shortcuts import render, render_to_response, redirect
 from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseBadRequest, HttpResponseNotFound
 from django.template import RequestContext, loader
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_protect
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger, InvalidPage 
 from itertools import chain
 from datetime import datetime, timedelta
 from django.views.generic import ListView
@@ -19,6 +20,7 @@ from forms import TaskForm, TaskAdminForm
 from django.contrib.auth.models import User
 from subprocess import Popen, PIPE
 from django.db.models import Q
+from django.contrib.auth.decorators import login_required
 
 def send_postfix_mail(body, sub, to):
     try:
@@ -183,6 +185,7 @@ def task_details(request, task_id):
     return HttpResponse(template.render(context))
 
 
+@login_required
 def edit_task(request, task_id):
     """
     Edit task.
@@ -430,22 +433,6 @@ def task_list(request):
     This is main landing page. Home page.
     """
 
-    '''
-    import random
-    i = 0
-    while i < 50:
-        j = 0
-        sss = ''
-        while j < 6:
-            sss += chr(random.randint(97, 122))
-            j += 1
-        ttask = TaskQ.objects.create(floor=3, room=2, desc=sss, \
-                repeatable=False, repeat_time=None, \
-                priority='H')
-        ttask.save()
-        i += 1
-    '''
-
     template = loader.get_template('task_list.html')
     p_tasks =  i_tasks = n_tasks = c_tasks = []
     tasks = TaskQ.objects.all()
@@ -470,50 +457,49 @@ def task_list(request):
 
     p_tasks = list(chain(progress, pending))
 
-    # Paginate pages with 10 records / page.
-    paginator = Paginator(p_tasks, 100)
-    page = request.GET.get('page', '1')
-    try:
-        ptask_list = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        ptask_list = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999),
-        # deliver last page of results.
-        ptask_list = paginator.page(paginator.num_pages)
-
-
-    #
-    # In-progress tasks
-    #
-    i_tasks = tasks.filter(status='I')
-    # Paginate pages with 10 records / page.
-    paginator = Paginator(i_tasks, 5)
-    page = request.GET.get('page', '1')
-    try:
-        itask_list = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        itask_list = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999),
-        # deliver last page of results.
-        itask_list = paginator.page(paginator.num_pages)
-
+    if request.is_ajax():
+        
+        Fpg=request.session.get('Fpg')
+        Bpg=request.session.get('Bpg')
+        p = Paginator(p_tasks, 5)
+        if request.GET['direction']=='forword':
+            if p.page(Fpg).has_next():
+                print "forword" 
+                Fpg+=1
+                p_tasks = p.page(Fpg)
+                Bpg+=1
+                request.session['Fpg'] = Fpg
+                request.session['Bpg'] = Bpg
+            else:
+                return HttpResponseNotFound("forword")   
+        elif request.GET['direction']=='backword':
+            if p.page(Bpg).has_previous():
+                Bpg-=1
+                p_tasks = p.page(Bpg)
+                Fpg-=1
+                request.session['Fpg'] = Fpg
+                request.session['Bpg'] = Bpg
+            else:
+                return HttpResponseNotFound("backword")
+             
+        else:
+            pass
+        print Bpg,Fpg
+        return render(request, 'other_list_table_row.html',\
+             {"p_tasks": p_tasks,'target':'/task/list/'}
+        )
 
     task_cnt = len(tasks)
     pending_cnt = len(p_tasks)
     progress_cnt = len(i_tasks)
+    p_tasks=p_tasks[0:20]
 
     context = RequestContext(request, {
-                'tasks':tasks,\
                 'p_tasks': p_tasks,\
-                'ptask_list': ptask_list, \
                 'active': 'tasklist',})
+    request.session['Fpg'] = 4
+    request.session['Bpg'] = 0
     return HttpResponse(template.render(context))
-
-
 
 
 def completed_list(request):
@@ -535,24 +521,6 @@ def completed_list(request):
     progress_cnt = len(i_tasks)
     impossible_cnt = len(n_tasks)
     other_cnt = progress_cnt + impossible_cnt
-
-
-    #
-    # Complete tasks
-    #
-    c_tasks = tasks.filter(status='C').order_by('-completed')
-    # Paginate pages with 10 records / page.
-    paginator = Paginator(c_tasks, 50)
-    page = request.GET.get('page', '1')
-    try:
-        ctask_list = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        ctask_list = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999),
-        # deliver last page of results.
-        ctask_list = paginator.page(paginator.num_pages)
 
     task_cnt = len(tasks)
     complete_cnt = len(c_tasks)
@@ -580,18 +548,48 @@ def completed_list(request):
             #avg_closure_time = "NA"
             task_done_rate = "NA"
 
+    if request.is_ajax():
+        
+        Fpg=request.session.get('Fpg')
+        Bpg=request.session.get('Bpg')
+        p = Paginator(c_tasks, 5)
+        if request.GET['direction']=='forword':
+            if p.page(Fpg).has_next():
+                print "forword" 
+                Fpg+=1
+                c_tasks = p.page(Fpg)
+                Bpg+=1
+                request.session['Fpg'] = Fpg
+                request.session['Bpg'] = Bpg
+            else:
+                return HttpResponseNotFound("forword")   
+        elif request.GET['direction']=='backword':
+            if p.page(Bpg).has_previous():
+                Bpg-=1
+                c_tasks = p.page(Bpg)
+                Fpg-=1
+                request.session['Fpg'] = Fpg
+                request.session['Bpg'] = Bpg
+            else:
+                return HttpResponseNotFound("backword")
+             
+        else:
+            pass
+        print Bpg,Fpg
+        return render(request, 'completed_list_table_row.html',{"c_tasks": c_tasks})
 
+    c_tasks=c_tasks[0:20]
     context = RequestContext(request, {
                 'tasks':tasks,\
                 'c_tasks': c_tasks,
-                'ctask_list':ctask_list, \
-                'task_cnt': task_cnt, 'pending_cnt': pending_cnt,\
-                'complete_cnt': complete_cnt, 'progress_cnt':progress_cnt,\
-                #'avg_closure_time': avg_closure_time,
-                'week_cnt': week_cnt,
-                'week_done_cnt': week_done_cnt,
-                'task_done_rate': task_done_rate,
-                'active': 'ctasklist',})
+                'week_cnt': week_cnt,\
+                'week_done_cnt': week_done_cnt,\
+                'task_done_rate': task_done_rate,\
+                'active': 'ctasklist',\
+                'target':'/task/clist/', \
+                })
+    request.session['Fpg'] = 4
+    request.session['Bpg'] = 0
     return HttpResponse(template.render(context))
 
 
@@ -609,20 +607,43 @@ def other_list(request):
     #
     other_tasks =  tasks.filter(status__in=['X'])
     other_tasks = other_tasks.order_by('modified')
+    if request.is_ajax():
+        print "ajax"
+        Fpg=request.session.get('Fpg')
+        Bpg=request.session.get('Bpg')
+        p=Paginator(other_tasks,5)
+        if request.GET['direction']=='forword':
+            if p.page(Fpg).has_next():
+                Fpg+=1
+                other_tasks=p.page(Fpg)
+                print len(other_tasks) 
+                Bpg+=1
+                request.session['Fpg']=Fpg
+                request.session['Bpg']=Bpg
+            else:
+                return HttpResponseNotFound('forword')
+        elif request.GET['direction']=='backword':
+            if p.page(Fpg).has_previous():
+                Fpg-=1
+                other_tasks=p.page(Fpg)
+                Bpg-=1
+                request.session['Fpg']=Fpg
+                request.session['Bpg']=Bpg
+            else:
+                return HttpResponseNotFound('backword')
+        else:
+            pass
+        return render(request, 'other_list_table_row.html', {
+                "xtasks": other_tasks})
+
+    other_tasks=other_tasks[0:20]
     context = RequestContext(request, {
                 'xtasks':other_tasks, \
-                'active': 'otherlist',})
+                'active': 'otherlist',\
+                'target':'/task/other/'})
+
+    request.session['Fpg'] = 4
+    request.session['Bpg'] = 0
     return HttpResponse(template.render(context))
-
-
-class OtherList(ListView):
-    model = TaskQ
-    template_name = "other_list.html"
-
-    def get_queryset(self):
-        objects = TaskQ.objects.filter()
-        print objects
-        return objects
-
 
 

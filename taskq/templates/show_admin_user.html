@@ -20,7 +20,7 @@
     </div>
 {% else %}
     <h5>
-    <a href='{% url "socialauth_begin" "google-oauth2" %}'>
+    <a href='{% url "socialauth_begin" "google-oauth2" %}?next={{request.get_full_path}}' >
         <span class="pull-right" 
             style="color:#FFF;test-decoration:none;margin-top:10px;margin-bottom:5px;"><i>G+ Login</i> </span>
     </a>

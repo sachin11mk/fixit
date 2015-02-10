@@ -8,7 +8,8 @@
             <h3 style='color:red;'>Pending Tasks</h3>
         </blockquote>
         {%endcomment%}
-        <table class="table table-bordered" id="task-list-table">
+        <input type="hidden" id="uri" name="variable" value="{{target}}">
+        <table class="table table-condensed" id="task-list-table">
             <thead>
                 <th width="5%"><b>#</b></th>
                 <th width="10%"><b>Time</b></th>
@@ -21,85 +22,10 @@
             </thead>
         </table>
 
-        <div id="task-list-scroll">
-            <table class="table table-bordered" id="task-list-table-1">
-                <tbody id="task-list-tbody">
-                    {%for  task in p_tasks%}
-                        <tr {%if task.repeatable %} style="border-left: solid blue 2px;" 
-                            {%elif task.status == 'I'%} style="border-left: solid green 2px;"
-                            {%endif%}>
-                    
-                            <td width="5%">
-                                <small>
-                                    {{forloop.counter}}.
-                                </small>
-                            </td>
-                            <td width="10%">
-                                <small>
-                                    {% if task.repeatable %}
-                                        &nbsp;
-                                        <span class="glyphicon glyphicon-repeat"
-                                            style="color:blue; font-weight:bold;"
-                                            title="Timeout: {{task.repeat_time}}">
-                                        </span>&nbsp;
-                                        {%repeat_timesince task.id %}
-                                    {% else %}
-                                        {%pending_timesince task.id %}
-                                    {%endif%}
-                                </small>
-                            </td>
-                            <td width="15%">
-                                <small>
-                                    {% show_location task%}
-                                </small>
-                            </td>
-                            <td width="42%" title="{{task.desc}}">
-                                {#{task.desc|truncatechars:60}#}
-                                <small>
-                                    {{task.desc}}
-                                </small>
-                            </td>
-                            <td width="8%" {%if task.status == 'I' %}
-                                    style='background:#BEF781;' title="In-Progress"{%endif%}>
-                                <small>
-                                    {% show_pending_priority task %} 
-                                </small>
-                            </td>
-                            <td width="">
-                                <!-- Edit link -->
-                                <a href="{%if request.user.is_authenticated%} 
-                                            {%url 'edit_task' task.id%}
-                                        {%else%}
-                                            {% url 'socialauth_begin' 'google-oauth2' %} 
-                                        {%endif%}">
-                                    <span title="Edit" class="glyphicon glyphicon-pencil"></span></a>
-
-                                {%if request.user.is_superuser or request.user.is_staff%}
-                                    &nbsp; | &nbsp; 
-                                    <!-- Done link -->
-                                    <a title="Mark as done." href="{%url 'mark_task_complete' task.id%}">
-                                        <span title="Done" class="glyphicon glyphicon-ok"></span></a>
-                                    
-                                    <!-- Delete link -->
-                                    {%if request.user.is_superuser%}
-                                        &nbsp; | &nbsp;
-                                        <a id="id-del-task" href="{%url 'delete_task' task.id%}">
-                                        <span title="Delete" class="glyphicon glyphicon-trash"></span></a>
-                                    {%endif%}
-                                {%endif%}
-                                {%if task.cuser%}
-                                    &nbsp; | &nbsp;
-                                    <span title="Reporter: {%get_task_cuser task%}" class="glyphicon glyphicon-user"></span>
-                                {%endif%}
-                                {%if task.euser%}
-                                    &nbsp; | &nbsp;
-                                    <span title="Last Edited: {%get_task_euser task%}" class="glyphicon glyphicon-eye-open"></span>
-                                {%endif%}
-
-                            </td>
-                        </tr>         
-                    {%endfor%}
-
+        <div id="divtablecontent" onscroll="scrollalert()">
+            <table class="table table-bordered" id="full-table">
+                <tbody id="table-body">
+                    {% include 'task_list_table_row.html' %}
                 </tbody>
             </table>
             <br/><br/>
@@ -110,15 +36,7 @@
 
 
 {% block extra_js %}
+    <script src="{{STATIC_URL}}js/custom.js"></script>
     <script type="text/javascript">
-        $(document).ready(function(){
-            $('a#id-del-task').click(function(e){
-                var msg = "Do you want to delete task?"
-                var isDelete = window.confirm(msg);
-                if ( isDelete != true )
-                    e.preventDefault();
-                $(this).closest('form').trigger('submit');
-            });
-        });
     </script>
 {% endblock extra_js %}
