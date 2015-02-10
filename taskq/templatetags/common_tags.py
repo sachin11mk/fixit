@@ -158,7 +158,7 @@ def show_pending_cnt(context):
     except Exception, msg:
         request = None
 
-    tasks = TaskQ.objects.filter(status='P')
+    tasks = TaskQ.objects.filter(status__in=['P', 'I'])
     if request:
         if not request.user.is_superuser:
             tasks = tasks.exclude(repeat_time__gt=datetime.now())
@@ -173,9 +173,8 @@ def show_complete_cnt():
 
 @register.simple_tag
 def show_other_cnt():
-    i_tasks = TaskQ.objects.filter(status='I')
     x_tasks = TaskQ.objects.filter(status='X')
-    return len(i_tasks) + len(x_tasks)
+    return len(x_tasks)
 
 
 @register.simple_tag
