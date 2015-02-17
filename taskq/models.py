@@ -35,11 +35,11 @@ STATUS_CHOICES = (
 )
 
 PRIORITY_CHOICES = (
-        ('B', 'Blocker/Critical'),
-        ('H', 'High'),
-        ('M', 'Moderate'),
-        ('L', 'Low'),
-        ('T', 'Suggestion/Task'),
+        ('1', 'Blocker/Critical'),
+        ('2', 'High'),
+        ('3', 'Moderate'),
+        ('4', 'Low'),
+        ('5', 'Suggestion/Task'),
 )
 
 class TaskQ(models.Model):
@@ -50,7 +50,7 @@ class TaskQ(models.Model):
     desc = models.TextField()
     status = models.CharField(max_length=255, default='P',\
             choices=STATUS_CHOICES)
-    priority = models.CharField(max_length=255, null=True, default='M',\
+    priority = models.CharField(max_length=255, null=True, default='3',\
             choices=PRIORITY_CHOICES)
     created = models.DateTimeField(auto_now_add=True, editable=False)
     modified = models.DateTimeField(auto_now=True)

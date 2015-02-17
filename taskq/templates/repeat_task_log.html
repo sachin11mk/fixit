@@ -71,55 +71,31 @@
                         <td>{{forloop.counter|add:ptask_list.next_page_number}}.</td>
                 {#%endcomment%#}
                         <td>
-                            {%if task.floor == '0' %}
-                                Ground Floor
-                            {%elif task.floor == '1' %}
-                                First Floor
-                            {%elif task.floor == '2' %}
-                                Second Floor
-                            {%elif task.floor == '3' %}
-                                Third Floor
-                            {%elif task.floor == '4' %}
-                                Pantry
-                            {%endif%}
-                            =&gt;
-                            {%if task.room == '0' %}
-                                Conference     
-                            {%elif task.room == '1' %}
-                                Room 1 
-                            {%elif task.room == '2' %}
-                                Room 2 
-                            {%elif task.room == '3' %}
-                                Room 3 
-                            {%elif task.room == '4' %}
-                                WC 
-                            {%elif task.room == '5' %}
-                                Accounts 
-                            {%elif task.room == '6' %}
-                                Server
-                            {%endif%}
+                            {{ task.get_floor_display }} 
+                            &nbsp; =&gt; &nbsp;
+                            {{ task.get_room_display }}
                         </td>
                         <td title="{{task.desc}}">
                             {{task.desc|truncatechars:60}}
                         </td>
                         <td>
-                            {%if task.priority == 'B' %}
+                            {%if task.priority == '1' %}
                                 <span class="bg-blocker">
                                     Blocker
                                 </span>
-                            {%elif task.priority == 'H' %}
+                            {%elif task.priority == '2' %}
                                 <span class="bg-high">
                                     High
                                 </span>
-                            {%elif task.priority == 'M' %}
+                            {%elif task.priority == '3' %}
                                 <span class="bg-moderate">
                                     Moderate
                                 </span>
-                            {%elif task.priority == 'L' %}
+                            {%elif task.priority == '4' %}
                                 <span class="bg-low">
                                     Low
                                 </span>
-                            {%elif task.priority == 'T' %}
+                            {%elif task.priority == '5' %}
                                 <span class="bg-low">
                                     Suggestion
                                 </span>

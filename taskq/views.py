@@ -25,8 +25,6 @@ from django.contrib.auth.decorators import login_required
 def send_postfix_mail(body, sub, to):
     try:
         cmd = "echo '%s' | mail -s '%s' '%s'"%(body, sub, to)
-        print "TTTT"
-        print cmd
         sp = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
         sp.wait()
         if sp.returncode == 0:
@@ -35,7 +33,6 @@ def send_postfix_mail(body, sub, to):
             print sp.stderr.readlines()
             print "Error : Failed to send postfix mail"
     except Exception, msg:
-        print "++++++++++++"
         print msg
         pass
 
@@ -43,6 +40,7 @@ def send_postfix_mail(body, sub, to):
 # Create your views here.
 
 @csrf_protect
+@login_required
 def add_task(request):
     """
     GET : Render add task form.
@@ -126,59 +124,18 @@ def task_details(request, task_id):
     template = loader.get_template('task.html')
     task = TaskQ.objects.get(id=task_id)
     heading = ""
+    status = ""
+    priority = ""
+
     # Which Floor?
-    if task.floor == "0":
-        heading += "Ground Floor ==>"
-    elif task.floor == "1":
-        heading += "First Floor ==>"
-    elif task.floor == "2":
-        heading += "Second Floor ==>"
-    elif task.floor == "3":
-        heading += "Third Floor ==>"
-    else:
-        heading += "Pantry Area ==>"
+    heading += task.get_floor_display() + " ==> "
 
     # Which Room?
-    if task.room == "0":
-        heading += "Conference Room "
-    elif task.room == "1":
-        heading += "Room 1 "
-    elif task.room == "2":
-        heading += "Room 2 "
-    elif task.room == "3":
-        heading += "Room 3 "
-    elif task.room == "4":
-        heading += "WC "
-    elif task.room == "5":
-        heading += "Accounts "
-    elif task.room == "6":
-        heading += "Server "
-    elif task.room == "7":
-        heading += "Lunch Area "
-    elif task.room == "8":
-        heading += "Common Passage "
-    elif task.room == "9":
-        heading += "Stairwell "
-    elif task.room == "10":
-        heading += "Lift "
+    heading += task.get_room_display()
 
-    if task.status == "P":
-        status = "Pending"
-    elif task.status == "I":
-        status = "In Progress"
-    elif task.status == "C":
-        status = "Complete"
-    else:
-        status = "Not Possible"
+    status = task.get_status_display()
 
-    if task.priority == "B":
-        priority = "Blocker"
-    elif task.priority == "H":
-        priority = "High"
-    elif task.priority == "M":
-        priority = "Moderate"
-    else:
-        priority = "Low"
+    priority = task.get_priority_display()
 
     context = RequestContext(request, {'task': task, 'heading': heading,\
             'status': status, 'priority': priority})
@@ -437,7 +394,10 @@ def task_list(request):
     col_nm =  request.GET.get('sort_by',"priority")
     s_order=  request.GET.get('order',"ASC")
     if col_nm=="location":
-        p_tasks=TaskQ.objects.filter().order_by('floor')
+        if s_order=='ASC':
+            p_tasks=TaskQ.objects.filter().order_by('floor', 'priority')
+        if s_order=='DESC':
+            p_tasks=TaskQ.objects.filter().order_by('-floor', 'priority')
 
     else:
         p_tasks =  i_tasks = n_tasks = c_tasks = []
@@ -449,21 +409,7 @@ def task_list(request):
         if not request.user.is_superuser:
             p_tasks = p_tasks.exclude(repeat_time__gt=datetime.now())
 
-        #
-        # Pending tasks
-        #
-        t1 = p_tasks.filter(priority='B')
-        t2 = p_tasks.filter(priority='H')
-        t3 = p_tasks.filter(priority='M')
-        t4 = p_tasks.filter(priority='L')
-        t5 = p_tasks.filter(priority='T')
-        tp_tasks = list(chain(t1, t2, t3, t4, t5))
-
-        pending = tp_tasks
-
-        p_tasks = list(chain(progress, pending))
-    if s_order=='DESC':
-        p_tasks=p_tasks.reverse()
+        p_tasks = list(chain(progress, p_tasks))
 
     if request.is_ajax():
 
