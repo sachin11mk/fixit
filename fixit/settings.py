@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 SECRET_KEY = 'axg__p4v-z$7(-c#$*1-q^x)&x5*me4kqeknjzc9=ny^ag7^r_'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 TEMPLATE_DEBUG = DEBUG
 
@@ -93,7 +93,7 @@ DATABASES = {
         #'ENGINE': 'django.db.backends.sqlite3',
         #'NAME': os.path.join(BASE_DIR, 'fixit.db'),
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'test_fixit',
+        'NAME': 'fixit',
         'USER': 'colama',
         'PASSWORD': 'coriolis',
         'HOST': 'localhost',
