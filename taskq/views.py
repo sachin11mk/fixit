@@ -104,7 +104,7 @@ def add_task(request):
                 #
                 # comment out test automated mails.
                 #
-                send_postfix_mail(task.desc, sub, to[0])
+                #######send_postfix_mail(task.desc, sub, to[0])
 
             return HttpResponseRedirect(reverse('task_list'))
         else:
@@ -434,28 +434,36 @@ def task_list(request):
     """
 
     template = loader.get_template('task_list.html')
-    p_tasks =  i_tasks = n_tasks = c_tasks = []
-    tasks = TaskQ.objects.all()
-    tasks = tasks.order_by('priority')
+    col_nm =  request.GET.get('sort_by',"priority")
+    s_order=  request.GET.get('order',"ASC")
+    if col_nm=="location":
+        p_tasks=TaskQ.objects.filter().order_by('floor')
 
-    p_tasks = tasks.filter(status='P')
-    progress = tasks.filter(status='I')
-    if not request.user.is_superuser:
-        p_tasks = p_tasks.exclude(repeat_time__gt=datetime.now())
+    else:
+        p_tasks =  i_tasks = n_tasks = c_tasks = []
+        tasks = TaskQ.objects.all()
+        tasks = tasks.order_by('priority')
 
-    #
-    # Pending tasks
-    #
-    t1 = p_tasks.filter(priority='B')
-    t2 = p_tasks.filter(priority='H')
-    t3 = p_tasks.filter(priority='M')
-    t4 = p_tasks.filter(priority='L')
-    t5 = p_tasks.filter(priority='T')
-    tp_tasks = list(chain(t1, t2, t3, t4, t5))
+        p_tasks = tasks.filter(status='P')
+        progress = tasks.filter(status='I')
+        if not request.user.is_superuser:
+            p_tasks = p_tasks.exclude(repeat_time__gt=datetime.now())
 
-    pending = tp_tasks
+        #
+        # Pending tasks
+        #
+        t1 = p_tasks.filter(priority='B')
+        t2 = p_tasks.filter(priority='H')
+        t3 = p_tasks.filter(priority='M')
+        t4 = p_tasks.filter(priority='L')
+        t5 = p_tasks.filter(priority='T')
+        tp_tasks = list(chain(t1, t2, t3, t4, t5))
 
-    p_tasks = list(chain(progress, pending))
+        pending = tp_tasks
+
+        p_tasks = list(chain(progress, pending))
+    if s_order=='DESC':
+        p_tasks=p_tasks.reverse()
 
     if request.is_ajax():
 
@@ -473,7 +481,7 @@ def task_list(request):
             else:
                 return HttpResponseNotFound("forword")
         elif request.GET['direction']=='backword':
-            if p.page(Bpg).has_previous():
+            if p.page(Bpg).has_previous() and Bpg > 0:
                 Bpg-=1
                 p_tasks = p.page(Bpg)
                 Fpg-=1
@@ -484,19 +492,16 @@ def task_list(request):
 
         else:
             pass
-        print Bpg,Fpg
-        return render(request, 'other_list_table_row.html',\
-             {"p_tasks": p_tasks,'target':'/task/list/'}
-        )
 
-    task_cnt = len(tasks)
-    pending_cnt = len(p_tasks)
-    progress_cnt = len(i_tasks)
+        return render_to_response('task_list_table_row.html', {"p_tasks": p_tasks.object_list})
+
     p_tasks=p_tasks[0:20]
-
     context = RequestContext(request, {
                 'p_tasks': p_tasks,\
+                'sort_by': col_nm,\
+                's_order': s_order,\
                 'active': 'tasklist',})
+
     request.session['Fpg'] = 4
     request.session['Bpg'] = 0
     return HttpResponse(template.render(context))
@@ -521,6 +526,12 @@ def completed_list(request):
     progress_cnt = len(i_tasks)
     impossible_cnt = len(n_tasks)
     other_cnt = progress_cnt + impossible_cnt
+
+
+    #
+    # Complete tasks
+    #
+    c_tasks = tasks.filter(status='C').order_by('-completed')
 
     task_cnt = len(tasks)
     complete_cnt = len(c_tasks)
@@ -552,7 +563,6 @@ def completed_list(request):
 
         Fpg=request.session.get('Fpg')
         Bpg=request.session.get('Bpg')
-<<<<<<< HEAD
         p = Paginator(c_tasks, 5)
         if request.GET['direction']=='forword':
             if p.page(Fpg).has_next():
@@ -565,7 +575,7 @@ def completed_list(request):
             else:
                 return HttpResponseNotFound("forword")
         elif request.GET['direction']=='backword':
-            if p.page(Bpg).has_previous():
+            if p.page(Bpg).has_previous() and Bpg > 0:
                 Bpg-=1
                 c_tasks = p.page(Bpg)
                 Fpg-=1
@@ -576,53 +586,22 @@ def completed_list(request):
 
         else:
             pass
-=======
-        try:
-            p = Paginator(c_tasks, 5)
-            if request.GET['direction']=='forword':
-                if p.page(Fpg).has_next():
-                    print "forword"
-                    Fpg+=1
-                    c_tasks = p.page(Fpg)
-                    Bpg+=1
-                    request.session['Fpg'] = Fpg
-                    request.session['Bpg'] = Bpg
-                else:
-                    return HttpResponseNotFound("forword")
-            elif request.GET['direction']=='backword':
-                if p.page(Bpg).has_previous():
-                    Bpg-=1
-                    c_tasks = p.page(Bpg)
-                    Fpg-=1
-                    request.session['Fpg'] = Fpg
-                    request.session['Bpg'] = Bpg
-                else:
-                    return HttpResponseNotFound("backword")
-
-            else:
-                pass
-        except InvalidPage, ip:
-            print  ip
-            return HttpResponseNotFound()
-        except EmptyPage, ep:
-            print "AAA", ep
-            return HttpResponseNotFound()
-        except Exception, e:
-            print e
-            return HttpResponseNotFound()
->>>>>>> 2623fec97906acfed5c31c307dd01b125e85bc70
-        print Bpg,Fpg
         return render(request, 'completed_list_table_row.html',{"c_tasks": c_tasks})
+
 
     c_tasks=c_tasks[0:20]
     context = RequestContext(request, {
                 'tasks':tasks,\
                 'c_tasks': c_tasks,
+               # 'ctask_list':ctask_list, \
+                'task_cnt': task_cnt, 'pending_cnt': pending_cnt,\
+                'complete_cnt': complete_cnt, 'progress_cnt':progress_cnt,\
+                #'avg_closure_time': avg_closure_time,
                 'week_cnt': week_cnt,\
                 'week_done_cnt': week_done_cnt,\
                 'task_done_rate': task_done_rate,\
                 'active': 'ctasklist',\
-                'target':'/task/clist/', \
+               # 'target':'/task/clist/'\
                 })
     request.session['Fpg'] = 4
     request.session['Bpg'] = 0
@@ -636,13 +615,21 @@ def other_list(request):
     List of tasks marked as incomplete.
     """
     template = loader.get_template('other_list.html')
-    tasks = TaskQ.objects.all()
-    tasks = tasks.order_by('priority')
-    #
-    # Complete tasks
-    #
-    other_tasks =  tasks.filter(status__in=['X'])
-    other_tasks = other_tasks.order_by('modified')
+    col_nm =  request.GET.get('sort_by',"priority")
+    s_order=  request.GET.get('order',"ASC")
+    print "colomn is=",col_nm
+    if col_nm=="location":
+        other_tasks=TaskQ.objects.filter().order_by('floor')
+    else:
+        tasks = TaskQ.objects.all()
+        tasks = tasks.order_by('priority')
+        #
+        # Complete tasks
+        #
+        other_tasks =  tasks.filter(status__in=['X'])
+        other_tasks = other_tasks.order_by('modified')
+    if s_order=='DESC':
+        other_tasks=other_tasks.reverse()
     if request.is_ajax():
         print "ajax"
         Fpg=request.session.get('Fpg')
@@ -659,7 +646,7 @@ def other_list(request):
             else:
                 return HttpResponseNotFound('forword')
         elif request.GET['direction']=='backword':
-            if p.page(Fpg).has_previous():
+            if p.page(Bpg).has_previous() and Bpg > 0:
                 Fpg-=1
                 other_tasks=p.page(Fpg)
                 Bpg-=1
@@ -669,13 +656,14 @@ def other_list(request):
                 return HttpResponseNotFound('backword')
         else:
             pass
-        return render(request, 'other_list_table_row.html', {
-                "xtasks": other_tasks})
+        return render(request, 'other_list_table_row.html',{"xtasks":other_tasks})
 
     other_tasks=other_tasks[0:20]
     context = RequestContext(request, {
                 'xtasks':other_tasks, \
                 'active': 'otherlist',\
+                'sort_by': col_nm,\
+                's_order': s_order,\
                 'target':'/task/other/'})
 
     request.session['Fpg'] = 4

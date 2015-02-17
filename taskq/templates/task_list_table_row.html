@@ -4,11 +4,6 @@
         {%elif task.status == 'I'%} style="border-left: solid green 2px;"
         {%endif%}>
 
-        <td width="5%">
-            <small>
-                {{forloop.counter}}.
-            </small>
-        </td>
         <td width="10%">
             <small>
                 {% if task.repeatable %}
@@ -43,7 +38,7 @@
         <td width="">
             <!-- Edit link -->
             <a href="{%url 'edit_task' task.id%}">
-                <span title="Edit" class="glyphicon glyphicon-pencil"></span></a>
+            <span title="Edit" class="glyphicon glyphicon-pencil"></span></a>
 
             {%if request.user.is_superuser or request.user.is_staff%}
                 &nbsp; | &nbsp; 

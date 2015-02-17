@@ -11,45 +11,93 @@
     <link href="{{STATIC_URL}}bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="{{STATIC_URL}}/css/jquery-clockpicker.min.css" rel="stylesheet">
     <link href="{{STATIC_URL}}/css/support.css" rel="stylesheet">
-
+    <link rel="stylesheet" type="text/css" media="only screen and (max-device-width: 780px)" href="{{ STATIC_URL }}css/max-device-width-780px.css" />
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
       <script src="{{STATIC_URL}}js/html5shiv.min.js"></script>
       <script src="{{STATIC_URL}}js/respond.min.js"></script>
     <![endif]-->
+
+<style>
+
+@media screen and (max-width: 480px) {
+
+   /* input[name="search"] {
+       width: 200px;
+    } 
+    panel-heading > span::after{
+    font-family: "Glyphicons Halflings";
+    content: "\e003";
+    padding-left:10px;
+    border:1px solid #021a40;
+    }*/   
+   /* $("#my_act").append("<span> - 2nd!</span>"); */
+
+body { 
+font-size:12px;
+}
+
+#mybtn{ 
+float:left;
+}
+
+#ptask-div{ }
+.container {
+padding-right: 0px;
+padding-left: 0px;
+}
+
+.well{ padding:0px;}
+
+.navbar {
+margin-bottom: 0px;
+}
+
+.footer{
+    position:fixed;
+    height:20px;
+    background-color:red;
+    bottom:0px;
+    left:0px;
+    right:0px;
+    margin-bottom:0px;
+}
+
+
+}
+</style>
+
+
+
   </head>
   <body>
 
-    <!--<div class="navbar navbar-fixed-top"> -->
-    <div class="navbar">
-        <div class="navbar-inner">
-            <div class="container">
-                <div class="col-xs-2 col-sm-2">
-                    <h3 class="pull-left" style="margin-top: 10px;margin-bottom:5px;"><a id="brand" href="{%url 'task_list'%}">Fixit</a></h3>  
-                </div>
+   <nav class="navbar navbar-inverse fixed-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button id="mybtn" type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <a id="mylink" class="navbar-brand" href="{%url 'task_list'%}">Fixit</a>
+    </div><!-- navbar header -->
 
-                <div class="col-xs-8 col-sm-8 col-xs-offset-2 col-sm-offset-2">
-                    {%show_admin_user%}                    
-                </div>
-            </div>
-        </div>
-    </div>
-   
-    <div class="container">
-        <ul class="nav nav-tabs" >
-            <li role="presentation" id="task-list" {%if active == 'tasklist' %} class="active" {%endif%} >
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li role="presentation" id="task-list"  {%if active == 'tasklist' %} class="active" {%endif%} >
                 <a  href="{%url 'task_list'%}">
                 <span class="glyphicon glyphicon-list"></span> Pending <span class="badge">{%show_pending_cnt%}</span></a>
-            </li>
-            <li role="presentation" id="complete-list" {%if active == 'ctasklist' %} class="active" {%endif%} >
+        </li>
+        <li role="presentation" id="complete-list" {%if active == 'ctasklist' %} class="active" {%endif%} >
                 <a  href="{%url 'completed_list'%}">
                 <span class="glyphicon glyphicon-ok"></span> Completed <span class="badge">{%show_complete_cnt%}</span></a>
-            </li>
-            <li role="presentation" id="other-list" {%if active == 'otherlist' %} class="active" {%endif%} >
+        </li>
+        <li role="presentation" id="other-list" {%if active == 'otherlist' %} class="active" {%endif%} > 
                 <a  href="{%url 'other_list'%}">
                 <span class="glyphicon glyphicon-ban-circle"></span> Other <span class="badge">{%show_other_cnt%}</span></a>
-            </li>
+        </li>
             <li role="presentation"  {%if active == 'addtask' %} class="active" {%endif%}  >
                 <a href="{%url 'add_task'%}">
                 <span class="glyphicon glyphicon-plus"></span> Add</a>
@@ -60,8 +108,16 @@
                     <span class="glyphicon glyphicon-book"></span> Repeat Logs</a>
                 </li>
             {%endif%}
-        </ul> 
-    </div>
+
+      </ul>
+      <ul id="uspace" class="nav navbar-nav navbar-right">
+           {%show_admin_user%}                    
+      </ul>
+    </div><!-- navbar collapse -->
+  </div> <!-- navbar container fluid-->
+</nav>
+
+
 
     <div class="container main-div">
         <div class="row">

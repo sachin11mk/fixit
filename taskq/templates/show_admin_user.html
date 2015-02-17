@@ -1,22 +1,15 @@
 
 {% if is_auth %}
-    <div class="pull-right" style="color:#FFF;test-decoration:none;margin-top:10px;margin-bottom:5px;">
+    <div style="color:#FFF;test-decoration:none;margin-top:10px;margin-bottom:5px;" id="userspace">
         <a href="#" style="color:#FFF;">
             <span class="glyphicon glyphicon-user"></span>
             {{username|upper}}
         </a>
         <span>&nbsp;|&nbsp;</span>
 
-        {% if is_admin %}
-            {% url "admin_logout" as admin_logout %}
-                <span class="glyphicon glyphicon-off"></span>
-                <a href="{{admin_logout}}" style="color:#FFF;" title="LOGOUT">LOGOUT</a>
-        {%else%}
-            {% url "admin_logout" as admin_logout %}
-                <span class="glyphicon glyphicon-off"></span>
-                <a href="{{admin_logout}}" style="color:#FFF;" title="LOGOUT">LOGOUT</a>
-
-        {%endif%}
+        {% url "admin_logout" as admin_logout %}
+        <span class="glyphicon glyphicon-off"></span>
+        <a href="{{admin_logout}}" style="color:#FFF;" title="LOGOUT">LOGOUT</a>
     </div>
 {% else %}
     <h5>
@@ -26,29 +19,4 @@
     </a>
     </h5>
 {% endif %}
-
-
-{%comment%}
-    {{request.user}}
-    {{request}}
-    {% url "admin_login" as admin_login %}
-    <form method="POST" class="form-inline pull-right" 
-        role="form" action="{{admin_login}}">
-        {% csrf_token %}
-        <input type="text" class="form-control" name="username"
-            id="id_username" placeholder="Username">
-
-        <input type="password" class="form-control" name="password" 
-            id="id_password" placeholder="Password">
-        <button type="submit" class="btn btn-default">Login</button> 
-        <!--
-        -->
-
-        <a href='{% url "socialauth_begin" "google-oauth2" %}'>
-            <span class="small"> <i>login with Google</i> </span>
-        </a>
-
-       <input type="hidden" name="next" value="{{ next }}" />
-    </form>
-{%endcomment%}
 
