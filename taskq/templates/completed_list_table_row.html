@@ -2,11 +2,6 @@
 
 {%for  task in c_tasks%}
     <tr {%if task.repeatable %} style="border-left: solid blue 2px;"{%endif%}>
-        <td width="5%">
-            <small>
-                {{forloop.counter}}.
-            </small>
-        </td>
         <td width="10%">
             <small>
                 {% if task.repeatable %}

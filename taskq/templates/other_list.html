@@ -9,10 +9,28 @@
             <input type="hidden" id="uri" name="variable" value="{{target}}">
             <table class="table table-condensed" id="task-list-table">
                 <thead>
-                    <th width="5%"><b>#</b></th>
-                    <th width="15%"><b>Location</b></th>
+                    <th width="15%" class="sortable">
+                        <a href="{% url 'other_list' %}?sort_by=location&order={% ifequal s_order 'ASC' %}DESC{%else%}ASC{%endifequal%}"></a><b>Location</b>
+                        {%if sort_by == "location" %}
+                            {% if s_order == "ASC" %}
+                                <img src="{{ STATIC_URL }}fonts/ice-asc.gif" class="pull-right">
+                            {% else %}
+                                <img src="{{ STATIC_URL }}fonts/ice-desc.gif" class="pull-right">
+                            {%endif%}
+                        {%else%}
+                                <img src="{{ STATIC_URL }}fonts/ice-unsorted.gif" class="pull-right">
+                    {%endif%}
+                    </th>
                     <th width="42%"><b>Details</b></th>
-                    <th width="8%"><b>Priority</b></th>
+                    <th width="8%" class="sortable">
+                        <a href="{% url 'other_list' %}?sort_by=priority"></a><b>Priority</b>
+                        {%if sort_by == "priority" %}
+                            <img src="{{ STATIC_URL }}fonts/ice-asc.gif" class="pull-right">
+                        {%else%}
+                            <img src="{{ STATIC_URL }}fonts/ice-unsorted.gif" class="pull-right">
+                        {%endif%}
+                    </th>    
+    
                     <th width="12%"><b>Status</b></th>
                     <th><b>admin</a></th>
                     {%if request.user.is_superuser or request.user.is_staff%}
