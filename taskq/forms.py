@@ -133,7 +133,7 @@ class TaskForm(forms.ModelForm):
 
 class TaskAdminForm(TaskForm):
     status = forms.CharField(label='Status',
-                required=True,
+                required=False,
                 widget=forms.Select(attrs={'class': 'form-control',
                 'placeholder': 'Select Status'}, choices=STATUS_CHOICES ))
     class Meta:

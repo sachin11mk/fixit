@@ -61,6 +61,7 @@ def add_task(request):
             data['room'] = form.cleaned_data['room']
             data['desc'] = form.cleaned_data['desc']
             data['priority'] = form.cleaned_data['priority']
+            data['status'] = 'P'
             if request.POST.has_key('repeatable'):
                 repeatable = True
                 data['repeat_time'] = form.cleaned_data['repeat_time']
@@ -417,17 +418,17 @@ def task_list(request):
         Bpg=request.session.get('Bpg')
         p = Paginator(p_tasks, 5)
         if request.GET['direction']=='forword':
-            if p.page(Fpg).has_next():
+            if p.page(Fpg - 1).has_next():
                 print "forword"
-                Fpg+=1
                 p_tasks = p.page(Fpg)
+                Fpg+=1
                 Bpg+=1
                 request.session['Fpg'] = Fpg
                 request.session['Bpg'] = Bpg
             else:
                 return HttpResponseNotFound("forword")
         elif request.GET['direction']=='backword':
-            if p.page(Bpg).has_previous() and Bpg > 0:
+            if p.page(Bpg).has_previous():
                 Bpg-=1
                 p_tasks = p.page(Bpg)
                 Fpg-=1
@@ -448,8 +449,8 @@ def task_list(request):
                 's_order': s_order,\
                 'active': 'tasklist',})
 
-    request.session['Fpg'] = 4
-    request.session['Bpg'] = 0
+    request.session['Fpg'] = 5
+    request.session['Bpg'] = 1
     return HttpResponse(template.render(context))
 
 
@@ -511,17 +512,17 @@ def completed_list(request):
         Bpg=request.session.get('Bpg')
         p = Paginator(c_tasks, 5)
         if request.GET['direction']=='forword':
-            if p.page(Fpg).has_next():
+            if p.page(Fpg-1).has_next():
                 print "forword"
-                Fpg+=1
                 c_tasks = p.page(Fpg)
+                Fpg+=1
                 Bpg+=1
                 request.session['Fpg'] = Fpg
                 request.session['Bpg'] = Bpg
             else:
                 return HttpResponseNotFound("forword")
         elif request.GET['direction']=='backword':
-            if p.page(Bpg).has_previous() and Bpg > 0:
+            if p.page(Bpg).has_previous():
                 Bpg-=1
                 c_tasks = p.page(Bpg)
                 Fpg-=1
@@ -549,8 +550,8 @@ def completed_list(request):
                 'active': 'ctasklist',\
                # 'target':'/task/clist/'\
                 })
-    request.session['Fpg'] = 4
-    request.session['Bpg'] = 0
+    request.session['Fpg'] = 5
+    request.session['Bpg'] = 1
     return HttpResponse(template.render(context))
 
 
@@ -565,7 +566,10 @@ def other_list(request):
     s_order=  request.GET.get('order',"ASC")
     print "colomn is=",col_nm
     if col_nm=="location":
-        other_tasks=TaskQ.objects.filter().order_by('floor')
+        if s_order=='ASC':
+            other_tasks=TaskQ.objects.filter().order_by('floor','priority')
+        if s_order=='DESC':
+            other_tasks=TaskQ.objects.filter().order_by('-floor','priority')
     else:
         tasks = TaskQ.objects.all()
         tasks = tasks.order_by('priority')
@@ -574,18 +578,15 @@ def other_list(request):
         #
         other_tasks =  tasks.filter(status__in=['X'])
         other_tasks = other_tasks.order_by('modified')
-    if s_order=='DESC':
-        other_tasks=other_tasks.reverse()
     if request.is_ajax():
         print "ajax"
         Fpg=request.session.get('Fpg')
         Bpg=request.session.get('Bpg')
         p=Paginator(other_tasks,5)
         if request.GET['direction']=='forword':
-            if p.page(Fpg).has_next():
-                Fpg+=1
+            if p.page(Fpg-1).has_next():
                 other_tasks=p.page(Fpg)
-                print len(other_tasks)
+                Fpg+=1
                 Bpg+=1
                 request.session['Fpg']=Fpg
                 request.session['Bpg']=Bpg
@@ -594,7 +595,7 @@ def other_list(request):
         elif request.GET['direction']=='backword':
             if p.page(Bpg).has_previous() and Bpg > 0:
                 Fpg-=1
-                other_tasks=p.page(Fpg)
+                other_tasks=p.page(Bpg)
                 Bpg-=1
                 request.session['Fpg']=Fpg
                 request.session['Bpg']=Bpg
@@ -612,8 +613,8 @@ def other_list(request):
                 's_order': s_order,\
                 'target':'/task/other/'})
 
-    request.session['Fpg'] = 4
-    request.session['Bpg'] = 0
+    request.session['Fpg'] = 5
+    request.session['Bpg'] = 1
     return HttpResponse(template.render(context))
 
 

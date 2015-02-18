@@ -84,4 +84,8 @@ div#divtablecontent{
     height: 400px; 
     overflow-y:auto; 
 }
+table#task-list-table{
+     margin-bottom:0px;
+     margin-top:0px;
+}
 
